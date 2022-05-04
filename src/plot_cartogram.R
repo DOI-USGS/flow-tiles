@@ -28,8 +28,8 @@ theme_flowfacet <- function(base = 12, color_bknd, text_color){
           panel.background = element_blank(),
           panel.spacing.x = unit(-2, "pt"),
           panel.spacing.y = unit(-5, "pt"),
-          legend.position = "none",
-          plot.margin = margin(0, 0, 0, 0, "pt"))
+          plot.margin = margin(0, 0, 0, 0, "pt"),
+          legend.box.background = element_rect(fill = NA, color = NA))
           
  }
 
@@ -42,7 +42,7 @@ plot_state_cartogram <- function(state_data, fips, pal, usa_grid, color_bknd){
       colour = "black",
       x_offset = 2,
       y_offset = 2,
-      sigma = 5,
+      sigma = 10,
       stack = TRUE
     ) +
     scale_fill_manual(values = rev(pal)) +
@@ -50,15 +50,16 @@ plot_state_cartogram <- function(state_data, fips, pal, usa_grid, color_bknd){
     scale_y_continuous(trans = "reverse") +
     theme_flowfacet(base = 12, color_bknd, text_color) +
     theme(plot.margin = margin(50, 50, 50, 50, "pt"),
-          #panel.spacing.y = unit(-8, "pt"),
-          strip.text.x = element_text(margin = margin(b = -5)),
+          panel.spacing.y = unit(-5, "pt"),
           panel.spacing.x = unit(4, "pt"),
-          strip.text = element_text(vjust = -1))+
+          strip.text = element_text(vjust = -1),
+          legend.position = 'none')+
     coord_fixed(ratio = 28)
 
 }
 
 plot_national_area <- function(national_data, date_start, date_end, pal, color_bknd){
+  
   # to label flow categories
   sec_labels <- national_data  %>%
     filter(date == max(national_data$date)) %>%
@@ -73,15 +74,7 @@ plot_national_area <- function(national_data, date_start, date_end, pal, color_b
       cond == 'Drier' & prop < 0.05 ~ 0.05,
       cond == 'Dry' & prop < 0.1 ~ 0.1,
       TRUE ~ prop
-    ),
-    # shift labels to be within y-extent of national plot
-    label_vjust = case_when(
-      cond == 'Wettest' ~ 1,
-      cond == 'Driest' ~ 0, 
-      TRUE ~ 0.5
     ))
-  
-  # force top and bottom labels to 0 and 1
   
   plot_nat <- national_data %>% 
     ggplot(aes(date, prop)) +
@@ -94,22 +87,20 @@ plot_national_area <- function(national_data, date_start, date_end, pal, color_b
                        breaks = rev(c(0.05,0.08, 0.15, 0.5, 0.75, 0.92, 0.95)), 
                        labels = c("0%","","","","", "","100%"),
                        sec.axis = dup_axis(
-                         breaks = sec_labels$position,
-                         labels = sec_labels$cond,
-                         guide = guide_axis(n.dodge = 7)
+                         labels = sec_labels$cond
                        )) +
     theme_flowfacet(base = 12, color_bknd, text_color) +
     theme(axis.text.y = 
             element_text(size = 12, 
-                         vjust = c(1, 0), # align yaxis labels to plot bounds
+                         vjust = c(1, 0), 
                          hjust = 1),
-          axis.title.x.bottom = element_text(size = 24,
+          axis.title.x.bottom = element_text(size = 20,
                                              vjust = -1,
                                              margin = margin(t = 5)),
-          axis.title.x.top = element_text(size = 24,
+          axis.title.x.top = element_text(size = 20,
                                           vjust = 0,
                                           margin = margin(b = -5)),
-          axis.text.x.bottom = element_text(size = 14,
+          axis.text.x.bottom = element_text(size = 12,
                                             vjust = 1,
                                             # nudge labels up closer to bottom
                                             margin = margin(t = -7))) +
@@ -122,7 +113,6 @@ plot_national_area <- function(national_data, date_start, date_end, pal, color_b
     guides(fill = guide_legend("")) +
     coord_fixed(ratio = 28, clip = "off")
   
-  plot_nat
   
   return(plot_nat)
 }
@@ -141,7 +131,7 @@ combine_plots <- function(file_out, plot_left, plot_right, date_start, width, he
   text_color <- "#444444"
   
   # logo
-  usgs_logo <- magick::image_read('../logo/usgs_logo_white.png') %>%
+  usgs_logo <- magick::image_read('in/usgs_logo.png') %>%
     magick::image_colorize(100, text_color)
   
   # streamflow title
@@ -155,7 +145,16 @@ combine_plots <- function(file_out, plot_left, plot_right, date_start, width, he
     width = 16, height = 9,
     gp = grid::gpar(fill = color_bknd, alpha = 1, col = color_bknd)
   )
-  
+  # get legend
+  plot_legend <- get_legend(plot_left +
+                              guides(fill = guide_legend(
+                                title = "",
+                                nrow = 1,
+                                direction = 'horizontal',
+                                box.background = element_blank(),
+                                label.position = "bottom"
+                              )))
+  # compose final plot
   ggdraw(ylim = c(0,1), 
          xlim = c(0,1)) +
     # a white background
@@ -164,19 +163,26 @@ combine_plots <- function(file_out, plot_left, plot_right, date_start, width, he
               height = 9, width = 16,
               hjust = 0, vjust = 1) +
     # national-level plot
-    draw_plot(plot_left+theme(text = element_text(family = font_legend, color = text_color)),
+    draw_plot(plot_left+theme(text = element_text(family = font_legend, color = text_color),
+                              legend.position = 'none'),
               x = plot_margin*2,
               y = 0.25,
               height = 0.45 ,
-              width = 0.3-plot_margin*4) +
+              width = 0.3-plot_margin*2) +
     # state tiles
     draw_plot(plot_right+theme(text = element_text(family = font_legend, color = text_color)),
-              x = 1-plot-margin*2,
-              y = 0+plot_margin*2,
+              x = 1,
+              y = 0+plot_margin,
               height = 1- plot_margin*4, 
-              width = 1-(0.3+plot_margin*2),
+              width = 1-(0.3+plot_margin*4),
               hjust = 1,
               vjust = 0) +
+    # add legend
+    draw_plot(plot_legend,
+              x = plot_margin*2,
+              y = 0.15,
+              height = 0.1 ,
+              width = 0.3-plot_margin*2) +
     # draw title
    draw_label(sprintf('%s %s', plot_month, plot_year),
               x = plot_margin*2, y = 1-plot_margin*4, 
