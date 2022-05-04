@@ -42,8 +42,9 @@ plot_state_cartogram <- function(state_data, fips, pal, usa_grid, color_bknd){
       colour = "black",
       x_offset = 2,
       y_offset = 2,
-      sigma = 10,
-      stack = TRUE
+      sigma = 5,
+      stack = TRUE,
+      with_background = FALSE
     ) +
     scale_fill_manual(values = rev(pal)) +
     facet_geo(~abb, grid = usa_grid, move_axes = FALSE) +
@@ -53,7 +54,9 @@ plot_state_cartogram <- function(state_data, fips, pal, usa_grid, color_bknd){
           panel.spacing.y = unit(-5, "pt"),
           panel.spacing.x = unit(4, "pt"),
           strip.text = element_text(vjust = -1),
-          legend.position = 'none')+
+          legend.position = 'none',
+          #strip.clip = 'off'
+          )+
     coord_fixed(ratio = 28)
 
 }
@@ -151,9 +154,10 @@ combine_plots <- function(file_out, plot_left, plot_right, date_start, width, he
                                 title = "",
                                 nrow = 1,
                                 direction = 'horizontal',
-                                box.background = element_blank(),
+                                box.background = element_rect(fill = NA),
                                 label.position = "bottom"
                               )))
+
   # compose final plot
   ggdraw(ylim = c(0,1), 
          xlim = c(0,1)) +
