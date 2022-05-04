@@ -1,4 +1,4 @@
-## Recreating the cartogram 
+## Recreating the streamflow tile map
   
 This repository uses the [`targets` package](https://docs.ropensci.org/targets/) to build the chart. Run `tar_make()` to execute `_targets.R` .  
 
