@@ -14,6 +14,3 @@ Running `tar_make()` will produce:
 ## Data  
 This viz piggybacks on the [`gage-conditions-gif`] data processing pipeline (https://github.com/USGS-VIZLAB/gage-conditions-gif) that depends on an internal pipelining package. The data file used corresponds to `scipiper::scmake("2_process/out/dv_stats.rds.ind", "2_process.yml")` generated for July 2021 in the pipeline. (Instructions for internal users generating the file used by this viz: either re-run the target for the appropriate dates or filter it to the correct date range. Then save as a CSV. The CSV file needs to be uploaded to the `water-visualizations-prod-website` S3 bucket and live at `visualizations/data/flow_conditions_{YYYYMM}.csv`.)
 
-These data are daily streamflow values from currently active USGS streamgages, provided as a percentile relative to the historic record. Percentiles were binned categorically as shown below.
-![image](https://user-images.githubusercontent.com/17803537/130290107-86ed5579-8050-4ba3-bdd3-88c9acf3c13c.png)
-
