@@ -184,7 +184,7 @@ combine_plots <- function(file_out, plot_left, plot_right, date_start, width, he
     # add legend
     draw_plot(plot_legend,
               x = plot_margin*2,
-              y = 0.15,
+              y = 0.1,
               height = 0.1 ,
               width = 0.3-plot_margin*2) +
     # draw title
@@ -204,6 +204,14 @@ combine_plots <- function(file_out, plot_left, plot_right, date_start, width, he
                width = 0.55,
                hjust = 0,
                vjust = 1) +
+    # percentile info
+    draw_label("Flow percentile at USGS streamgages\nrelative to the historic daily record.", 
+               x = plot_margin*2,
+               y = 0.25,
+               hjust = 0,
+               vjust = 1,
+               fontfamily = font_legend,
+               color = text_color) +
     # add data source
     draw_label("Data: USGS National Water Information System", 
                x = 1-plot_margin*2, y = plot_margin*2, 
