@@ -1,8 +1,11 @@
+#' @description Create tile grid for state map
 make_carto_grid <- function(){
   us_state_grid1 %>% 
     add_row(row = 7, col = 11, code = "PR", name = "Puerto Rico") %>% # add PR
     filter(code != "DC") # remove DC (only has 3 gages)
 }
+
+#' @description Pull state fips code to bind to state grid
 get_state_fips <- function(){
   maps::state.fips %>% 
     distinct(fips, abb) %>%
@@ -12,6 +15,10 @@ get_state_fips <- function(){
     mutate(state_cd = str_pad(fips, 2, "left", pad = "0"))
 }
 
+#' @description Basic plotting theme
+#' @param base Font size for relative scaling
+#' @param color_bknd The final plot background color
+#' @param text_color Color for the font
 theme_flowfacet <- function(base = 12, color_bknd, text_color){
   theme_classic(base_size = base) +
     theme(strip.background = element_blank(),
@@ -33,6 +40,11 @@ theme_flowfacet <- function(base = 12, color_bknd, text_color){
           
  }
 
+#' @description Plot states as tiled cartogram
+#' @param fips State codes
+#' @param pal color palette for each bin level
+#' @param usa_grid the grid layout for plotting with
+#' @param color_bknd Plot background color
 plot_state_cartogram <- function(state_data, fips, pal, usa_grid, color_bknd){
   state_data %>% 
     left_join(fips) %>% # to bind to cartogram grid
@@ -60,6 +72,12 @@ plot_state_cartogram <- function(state_data, fips, pal, usa_grid, color_bknd){
 
 }
 
+#' @description Plot nationa level flow conditions
+#' @param national_data The proportion of sites in each flow condition, daily
+#' @param date_start first day of focal month
+#' @param date_end last day of focal month
+#' @param pal color palette for each bin level
+#' @param color_bknd Plot background color
 plot_national_area <- function(national_data, date_start, date_end, pal, color_bknd){
   
   # to label flow categories
@@ -108,6 +126,14 @@ plot_national_area <- function(national_data, date_start, date_end, pal, color_b
   return(plot_nat)
 }
 
+#' @description Compose the final plot and annotate
+#' @param file_out Filepath to save to
+#' @param plot_left The national plot to position on the left
+#' @param plot_right The state tiles to position on the right
+#' @param date_start first day of focal month
+#' @param width Desired width of output plot
+#' @param height Desired height of output plot
+#' @param color_bknd Plot background color
 combine_plots <- function(file_out, plot_left, plot_right, date_start, width, height, color_bknd){
   
   plot_month <- lubridate::month(date_start, label = TRUE, abbr = FALSE)

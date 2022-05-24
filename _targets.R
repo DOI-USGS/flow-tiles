@@ -74,7 +74,7 @@ list(
     plot_cart,
     plot_state_cartogram(state_data = flow_state, fips, pal = pal_wetdry, usa_grid, color_bknd)
   ),
-  # Plot flow timeseries natioanlly
+  # Plot flow timeseries nationally
   tar_target(
     plot_nat,
     plot_national_area(national_data = flow_national, pal = pal_wetdry, date_start, date_end, color_bknd)

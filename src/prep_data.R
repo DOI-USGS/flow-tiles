@@ -1,3 +1,9 @@
+
+#' @description Bin percentile data into flow condition categories
+#' @param data_in 1 month of streamflow percentiles generated from `gage-conditions-gif` pipeline
+#' @param date_start first day of focal month
+#' @param date_end last day of focal month
+#' @param breaks Percentile values to bin data at
 add_flow_condition <- function(data_in, date_start, date_end, breaks){
   data_in %>% 
     mutate(date = as.Date(dateTime)) %>%
@@ -7,6 +13,9 @@ add_flow_condition <- function(data_in, date_start, date_end, breaks){
   
 }
 
+#' @description Count the total number of observed sites per state each day
+#' @param data_in Binned percentile data
+#' @param dv_site Site data with state localities
 site_count_state <- function(data_in, dv_site){
     data_in %>%
       left_join(dv_site)%>%
@@ -16,6 +25,8 @@ site_count_state <- function(data_in, dv_site){
 
 }
 
+#' @description Count total number of active sites nationally each day
+#' @param data_in Binned percentile data
 site_count_national <- function(data_in){
   data_in %>%
     group_by(date) %>%
@@ -23,6 +34,9 @@ site_count_national <- function(data_in){
   
 }
 
+#' @description Calculate proportion of sites in each percentile bin through time
+#' @param data_in Binned percentile data
+#' @param sites_national Total number of active sites each day
 flow_by_day <- function(data_in, sites_national) {
   data_in %>%
     group_by(date, percentile_cond, percentile_bin) %>%
@@ -31,6 +45,9 @@ flow_by_day <- function(data_in, sites_national) {
     mutate(prop = n_gage/total_gage)
 }
 
+#' @description Calculate proportion of sites in each percentile bin through time
+#' @param data_in Binned percentile data
+#' @param sites_national Total number of active sites each day by state
 flow_by_day_by_state <- function(data_in, dv_site, sites_state) {
   data_in  %>%
     left_join(dv_site) %>% # adds state info for each gage
