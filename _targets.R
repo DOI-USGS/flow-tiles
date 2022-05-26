@@ -12,56 +12,75 @@ date_end <- as.Date("2022-05-01") # Need to keep as first date of following mont
 
 # wet to dry color scale
 pal_wetdry <- c("#002D5E", "#0C7182", "#6CB7B0", "#A7D2D8", "#E0D796", "#AF9423", "#A84E0B")
+percentile_breaks = c(0, 0.05, 0.1, 0.25, 0.75, 0.9, 0.95, 1)
+percentile_labels <- c("Driest", "Drier", "Dry", "Normal","Wet","Wetter", "Wettest")
 color_bknd <- "#F4F4F4"
 text_color = "#444444"
 
 # to produce the flow cartogram, run tar_make() in the console
 list(
+  # Read in data from gage-flow-conditions pipeline output
   tar_target(
     dv,
-    read_csv("https://labs.waterdata.usgs.gov/visualizations/data/flow_conditions_202204.csv", col_types = "cTnnnnT")
+    read_csv("https://labs.waterdata.usgs.gov/visualizations/data/flow_conditions_202204.csv", col_types = "cTnnnn")
   ),
+  # Bin percentile data 
   tar_target(
     flow,
-    add_flow_condition(dv, date_start, date_end)
+    add_flow_condition(dv, date_start, date_end, breaks = percentile_breaks, break_labels = percentile_labels)
   ),
+  # Find list of all active sites
+  tar_target(
+    site_list,
+    unique(flow$site_no)
+  ),
+  # Pull site info (state) 
   tar_target(
     dv_site,
-    dataRetrieval::readNWISsite(siteNumbers = unique(flow$site_no)) %>%
+    dataRetrieval::readNWISsite(siteNumbers = site_list) %>%
       distinct(site_no, state_cd)
   ),
+  # Count the number of sites in each state
   tar_target(
     sites_state,
     site_count_state(flow, dv_site)
   ),
+  # Count total number of sites nationally
   tar_target(
     sites_national,
     site_count_national(sites_state)
   ),
+  # Find the proportion of sites in each flow category nationally
   tar_target(
     flow_national,
     flow_by_day(flow, sites_national)
   ),
+  # Find the proportion of sites in each flow category by each state
   tar_target(
     flow_state,
     flow_by_day_by_state(flow, dv_site, sites_state)
   ),
+  # Define grid for tile positioning
   tar_target(
     usa_grid,
     make_carto_grid()
   ),
+  # Pull fips codes to join state data to grid
   tar_target(
     fips,
     get_state_fips()
   ),
+  # Plot flow tiemseries for states
   tar_target(
     plot_cart,
     plot_state_cartogram(state_data = flow_state, fips, pal = pal_wetdry, usa_grid, color_bknd)
   ),
+  # Plot flow timeseries nationally
   tar_target(
     plot_nat,
     plot_national_area(national_data = flow_national, pal = pal_wetdry, date_start, date_end, color_bknd)
   ),
+  # Combine charts and assemble final plot
   tar_target(
     flow_cartogram_svg,
     combine_plots(file_out = "flow_cartogram.svg", 

@@ -1,8 +1,11 @@
+#' @description Create tile grid for state map
 make_carto_grid <- function(){
   us_state_grid1 %>% 
     add_row(row = 7, col = 11, code = "PR", name = "Puerto Rico") %>% # add PR
     filter(code != "DC") # remove DC (only has 3 gages)
 }
+
+#' @description Pull state fips code to bind to state grid
 get_state_fips <- function(){
   maps::state.fips %>% 
     distinct(fips, abb) %>%
@@ -12,6 +15,10 @@ get_state_fips <- function(){
     mutate(state_cd = str_pad(fips, 2, "left", pad = "0"))
 }
 
+#' @description Basic plotting theme
+#' @param base Font size for relative scaling
+#' @param color_bknd The final plot background color
+#' @param text_color Color for the font
 theme_flowfacet <- function(base = 12, color_bknd, text_color){
   theme_classic(base_size = base) +
     theme(strip.background = element_blank(),
@@ -29,16 +36,21 @@ theme_flowfacet <- function(base = 12, color_bknd, text_color){
           panel.spacing.x = unit(-2, "pt"),
           panel.spacing.y = unit(-5, "pt"),
           plot.margin = margin(0, 0, 0, 0, "pt"),
-          legend.box.background = element_rect(fill = NA, color = NA))
+          legend.box.background = element_rect(fill = color_bknd, color = NA))
           
  }
 
+#' @description Plot states as tiled cartogram
+#' @param fips State codes
+#' @param pal color palette for each bin level
+#' @param usa_grid the grid layout for plotting with
+#' @param color_bknd Plot background color
 plot_state_cartogram <- function(state_data, fips, pal, usa_grid, color_bknd){
   state_data %>% 
     left_join(fips) %>% # to bind to cartogram grid
     ggplot(aes(date, prop)) +
     with_shadow(
-      geom_area(aes(fill = cond)),
+      geom_area(aes(fill = percentile_cond)),
       colour = "black",
       x_offset = 2,
       y_offset = 2,
@@ -54,34 +66,29 @@ plot_state_cartogram <- function(state_data, fips, pal, usa_grid, color_bknd){
           panel.spacing.y = unit(-5, "pt"),
           panel.spacing.x = unit(4, "pt"),
           strip.text = element_text(vjust = -1),
-          legend.position = 'none',
-          #strip.clip = 'off'
+          legend.position = 'none'
           )+
     coord_fixed(ratio = 28)
 
 }
 
+#' @description Plot nationa level flow conditions
+#' @param national_data The proportion of sites in each flow condition, daily
+#' @param date_start first day of focal month
+#' @param date_end last day of focal month
+#' @param pal color palette for each bin level
+#' @param color_bknd Plot background color
 plot_national_area <- function(national_data, date_start, date_end, pal, color_bknd){
   
   # to label flow categories
   sec_labels <- national_data  %>%
     filter(date == max(national_data$date)) %>%
-    distinct(cond, prop) %>%
-    mutate(prop = cumsum(prop)) %>%
-    # control positions of categorical labels
-    mutate(position = case_when(
-      cond == 'Wettest' ~ 1,
-      cond == 'Driest' ~ 0,
-      cond == 'Wetter' & prop > 0.95 ~ 0.95,
-      cond == 'Wet' & prop > 0.9 ~ 0.9,
-      cond == 'Drier' & prop < 0.05 ~ 0.05,
-      cond == 'Dry' & prop < 0.1 ~ 0.1,
-      TRUE ~ prop
-    ))
+    distinct(percentile_cond, prop) %>%
+    mutate(prop = cumsum(prop))
   
   plot_nat <- national_data %>% 
     ggplot(aes(date, prop)) +
-    geom_area(aes(fill = cond)) +
+    geom_area(aes(fill = percentile_bin)) +
     theme_classic() +
     labs(x = lubridate::month(date_end - 30, label = TRUE, abbr = FALSE),
          y="") +
@@ -90,7 +97,7 @@ plot_national_area <- function(national_data, date_start, date_end, pal, color_b
                        breaks = rev(c(0.05,0.08, 0.15, 0.5, 0.75, 0.92, 0.95)), 
                        labels = c("0%","","","","", "","100%"),
                        sec.axis = dup_axis(
-                         labels = sec_labels$cond
+                         labels = sec_labels$percentile_cond
                        )) +
     theme_flowfacet(base = 12, color_bknd, text_color) +
     theme(axis.text.y = 
@@ -113,13 +120,20 @@ plot_national_area <- function(national_data, date_start, date_end, pal, color_b
                  sec.axis = dup_axis(
                    name = "National"
                  )) +
-    guides(fill = guide_legend("")) +
     coord_fixed(ratio = 28, clip = "off")
   
   
   return(plot_nat)
 }
 
+#' @description Compose the final plot and annotate
+#' @param file_out Filepath to save to
+#' @param plot_left The national plot to position on the left
+#' @param plot_right The state tiles to position on the right
+#' @param date_start first day of focal month
+#' @param width Desired width of output plot
+#' @param height Desired height of output plot
+#' @param color_bknd Plot background color
 combine_plots <- function(file_out, plot_left, plot_right, date_start, width, height, color_bknd){
   
   plot_month <- lubridate::month(date_start, label = TRUE, abbr = FALSE)
@@ -133,7 +147,7 @@ combine_plots <- function(file_out, plot_left, plot_right, date_start, width, he
   
   text_color <- "#444444"
   
-  # logo
+  # usgs logo
   usgs_logo <- magick::image_read('in/usgs_logo.png') %>%
     magick::image_colorize(100, text_color)
   
@@ -148,15 +162,25 @@ combine_plots <- function(file_out, plot_left, plot_right, date_start, width, he
     width = 16, height = 9,
     gp = grid::gpar(fill = color_bknd, alpha = 1, col = color_bknd)
   )
-  # get legend
-  plot_legend <- get_legend(plot_left +
-                              guides(fill = guide_legend(
-                                title = "",
-                                nrow = 1,
-                                direction = 'horizontal',
-                                box.background = element_rect(fill = NA),
-                                label.position = "bottom"
-                              )))
+  
+  # Restyle legend
+  plot_left <- plot_left +
+    guides(fill = guide_colorsteps(
+      title = "",
+      nrow = 1,
+      direction = 'horizontal',
+      label.position = "bottom",
+      barwidth = 22,
+      barheight = 1,
+      background = element_rect(fill = NA),
+      show.limits = TRUE,
+      even.steps = FALSE
+    )) +
+      theme(legend.background = element_rect(fill = NA),
+            text = element_text(family = font_legend, color = text_color))
+  
+  # Extract from plot
+  plot_legend <- get_legend(plot_left)
 
   # compose final plot
   ggdraw(ylim = c(0,1), 
@@ -167,26 +191,25 @@ combine_plots <- function(file_out, plot_left, plot_right, date_start, width, he
               height = 9, width = 16,
               hjust = 0, vjust = 1) +
     # national-level plot
-    draw_plot(plot_left+theme(text = element_text(family = font_legend, color = text_color),
-                              legend.position = 'none'),
+    draw_plot(plot_left+theme(legend.position = 'none'),
               x = plot_margin*2,
               y = 0.25,
               height = 0.45 ,
               width = 0.3-plot_margin*2) +
     # state tiles
-    draw_plot(plot_right+theme(text = element_text(family = font_legend, color = text_color)),
-              x = 1,
-              y = 0+plot_margin,
-              height = 1- plot_margin*4, 
-              width = 1-(0.3+plot_margin*4),
-              hjust = 1,
-              vjust = 0) +
+   draw_plot(plot_right+theme(text = element_text(family = font_legend, color = text_color)),
+             x = 1,
+             y = 0+plot_margin,
+             height = 1- plot_margin*4, 
+             width = 1-(0.3+plot_margin*4),
+             hjust = 1,
+             vjust = 0) +
     # add legend
     draw_plot(plot_legend,
               x = plot_margin*2,
-              y = 0.15,
-              height = 0.1 ,
-              width = 0.3-plot_margin*2) +
+              y = 0.1,
+              height = 0.13 ,
+              width = 0.3-plot_margin) +
     # draw title
    draw_label(sprintf('%s %s', plot_month, plot_year),
               x = plot_margin*2, y = 1-plot_margin*4, 
@@ -204,6 +227,14 @@ combine_plots <- function(file_out, plot_left, plot_right, date_start, width, he
                width = 0.55,
                hjust = 0,
                vjust = 1) +
+    # percentile info
+    draw_label("Flow percentile at USGS streamgages\nrelative to the historic daily record.", 
+               x = plot_margin*2,
+               y = 0.25,
+               hjust = 0,
+               vjust = 1,
+               fontfamily = font_legend,
+               color = text_color) +
     # add data source
     draw_label("Data: USGS National Water Information System", 
                x = 1-plot_margin*2, y = plot_margin*2, 
