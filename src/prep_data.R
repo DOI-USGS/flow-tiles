@@ -4,12 +4,12 @@
 #' @param date_start first day of focal month
 #' @param date_end last day of focal month
 #' @param breaks Percentile values to bin data at
-add_flow_condition <- function(data_in, date_start, date_end, breaks){
+add_flow_condition <- function(data_in, date_start, date_end, breaks, break_labels = c("Driest", "Drier", "Dry", "Normal","Wet","Wetter", "Wettest")){
   data_in %>% 
     mutate(date = as.Date(dateTime)) %>%
     filter(date >= date_start, date <= date_end, !is.na(per)) %>%
     mutate(percentile_bin = cut(per, breaks = breaks, include.lowest = TRUE),
-           percentile_cond = factor(percentile_bin, labels = c("Driest", "Drier", "Dry", "Normal","Wet","Wetter", "Wettest")))
+           percentile_cond = factor(percentile_bin, labels = break_labels))
   
 }
 

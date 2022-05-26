@@ -13,6 +13,7 @@ date_end <- as.Date("2022-05-01") # Need to keep as first date of following mont
 # wet to dry color scale
 pal_wetdry <- c("#002D5E", "#0C7182", "#6CB7B0", "#A7D2D8", "#E0D796", "#AF9423", "#A84E0B")
 percentile_breaks = c(0, 0.05, 0.1, 0.25, 0.75, 0.9, 0.95, 1)
+percentile_labels <- c("Driest", "Drier", "Dry", "Normal","Wet","Wetter", "Wettest")
 color_bknd <- "#F4F4F4"
 text_color = "#444444"
 
@@ -26,7 +27,7 @@ list(
   # Bin percentile data 
   tar_target(
     flow,
-    add_flow_condition(dv, date_start, date_end, breaks = percentile_breaks)
+    add_flow_condition(dv, date_start, date_end, breaks = percentile_breaks, break_labels = percentile_labels)
   ),
   # Find list of all active sites
   tar_target(
