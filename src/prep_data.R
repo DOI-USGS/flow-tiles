@@ -1,5 +1,5 @@
 
-#' @description Bin percentile data into flow condition categories
+#' @description Bin percentile data (`percentile_bin`) into flow condition (`percentile_cond`) categories
 #' @param data_in 1 month of streamflow percentiles generated from `gage-conditions-gif` pipeline
 #' @param date_start first day of focal month
 #' @param date_end last day of focal month
