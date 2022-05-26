@@ -4,11 +4,13 @@ This repository uses the [`targets` package](https://docs.ropensci.org/targets/)
 
 Install all packages needed to run: 
 ```
-install.packages(c('targets', 'tidyverse', 'lubridate', 'geofacet', 'cowplot','ggfx', 'showtext'))
+install.packages(c('targets', 'tidyverse', 'lubridate', 'geofacet', 'cowplot','ggfx', 'showtext', 'magick'))
 ```
 
 Running `tar_make()` will produce: 
-![flow_cartogram](https://user-images.githubusercontent.com/17803537/167505861-b2ea7116-c603-47c0-b0bf-883481c48145.png)
+
+![flow_cartogram](https://user-images.githubusercontent.com/17803537/170506392-edd98b21-3ba7-4fc0-b3a9-18da94aa26b0.png)
+
 
 Final touches were done in a vector graphics editor. The main action is to delete clip paths around each tile to open up to the drop shadow.
 
