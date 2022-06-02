@@ -134,7 +134,7 @@ plot_national_area <- function(national_data, date_start, date_end, pal, color_b
 #' @param width Desired width of output plot
 #' @param height Desired height of output plot
 #' @param color_bknd Plot background color
-combine_plots <- function(file_name, plot_left, plot_right, date_start, width, height, color_bknd){
+combine_plots <- function(file_svg, plot_left, plot_right, date_start, width, height, color_bknd){
   
   plot_month <- lubridate::month(date_start, label = TRUE, abbr = FALSE)
   plot_year <- lubridate::year(date_start)
@@ -248,25 +248,15 @@ combine_plots <- function(file_name, plot_left, plot_right, date_start, width, h
   draw_image(usgs_logo, x = plot_margin*2, y = plot_margin*2, width = 0.1, hjust = 0, vjust = 0, halign = 0, valign = 0)
   
   # Save and convert file
-  file_svg <- sprintf('%s.svg',  file_name)
-  file_png <- sprintf('%s.png',  file_name)
   ggsave(file_svg, width = width, height = height, dpi = 300)
-  
-  # Clean up svg
-  rm_facet_clip(svg_in = file_svg, svg_out = file_svg)
-  
-  # Render the svg into a png image with rsvg via magick
-  img <- magick::image_read_svg(file_svg, width = width*300)
-  magick::image_write(img, file_png)
-  
-  return(file_png)
+  return(file_svg)
   
 }
 
 #' @description Remove clipping masks from facets
 #' @param file_in Filepath to svg output
 #' @param file_out Filepath to save
-rm_facet_clip <- function(svg_in, svg_out){
+rm_facet_clip <- function(svg_in, file_out, width){
   
   # Read in svg
   x <- read_xml(svg_in) 
@@ -284,8 +274,11 @@ rm_facet_clip <- function(svg_in, svg_out){
   # TODO: find clipPaths using shared attr
   xml_remove(x_drop)
   
-  # Add xmlns back in and save
+  # Add xmlns back in and save svg
   xml_set_attr(x, attr = "xmlns", 'http://www.w3.org/2000/svg')
-  write_xml(x, file = svg_out)
+  write_xml(x, file = svg_in)
+  # Render the svg into a png image with rsvg via magick
+  img <- magick::image_read_svg(svg_in, width = width*300)
+  magick::image_write(img, file_out)
 
 }
