@@ -4,7 +4,7 @@ This repository uses the [`targets` package](https://docs.ropensci.org/targets/)
 
 Install all packages needed to run: 
 ```
-install.packages(c('targets', 'tidyverse', 'lubridate', 'geofacet', 'cowplot','ggfx', 'showtext', 'magick'))
+install.packages(c('targets', 'tidyverse', 'lubridate', 'geofacet', 'cowplot','ggfx', 'showtext', 'magick', 'xml2'))
 ```
 
 Running `tar_make()` will produce: 
