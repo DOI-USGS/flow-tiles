@@ -1,7 +1,9 @@
 library(targets)
 
 options(tidyverse.quiet = TRUE)
-tar_option_set(packages = c('tidyverse', 'lubridate', 'geofacet', 'cowplot','ggfx', 'showtext', 'xml2'))
+
+tar_option_set(packages = c('tidyverse', 'lubridate', 'geofacet', 'cowplot','ggfx', 'showtext', 'magick', 'maps', 'svglite', 'xml2'))
+
 
 source("src/prep_data.R")
 source("src/plot_cartogram.R")
