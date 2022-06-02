@@ -94,10 +94,10 @@ plot_national_area <- function(national_data, date_start, date_end, pal, color_b
          y="") +
     scale_fill_manual(values = rev(pal)) +
     scale_y_continuous(trans = "reverse",
-                       breaks = rev(c(0.05,0.08, 0.15, 0.5, 0.75, 0.92, 0.95)), 
-                       labels = c("0%","","","","", "","100%"),
+                       breaks = rev(c(0.05,0.5, 0.95)), 
+                       labels = c("0%","gages","100%"),
                        sec.axis = dup_axis(
-                         labels = sec_labels$percentile_cond
+                         labels = c("Dry", "", "Wet")
                        )) +
     theme_flowfacet(base = 12, color_bknd, text_color) +
     theme(axis.text.y = 
@@ -134,7 +134,7 @@ plot_national_area <- function(national_data, date_start, date_end, pal, color_b
 #' @param width Desired width of output plot
 #' @param height Desired height of output plot
 #' @param color_bknd Plot background color
-combine_plots <- function(file_out, plot_left, plot_right, date_start, width, height, color_bknd){
+combine_plots <- function(file_name, plot_left, plot_right, date_start, width, height, color_bknd){
   
   plot_month <- lubridate::month(date_start, label = TRUE, abbr = FALSE)
   plot_year <- lubridate::year(date_start)
@@ -201,7 +201,7 @@ combine_plots <- function(file_out, plot_left, plot_right, date_start, width, he
              x = 1,
              y = 0+plot_margin,
              height = 1- plot_margin*4, 
-             width = 1-(0.3+plot_margin*4),
+             width = 1-(0.3+plot_margin*2),
              hjust = 1,
              vjust = 0) +
     # add legend
@@ -245,10 +245,47 @@ combine_plots <- function(file_out, plot_left, plot_right, date_start, width, he
                color = text_color,
                lineheight = 1.1) +
    # add logo
-    draw_image(usgs_logo, x = plot_margin*2, y = plot_margin*2, width = 0.1, hjust = 0, vjust = 0, halign = 0, valign = 0)
+  draw_image(usgs_logo, x = plot_margin*2, y = plot_margin*2, width = 0.1, hjust = 0, vjust = 0, halign = 0, valign = 0)
   
+  # Save and convert file
+  file_svg <- sprintf('%s.svg',  file_name)
+  file_png <- sprintf('%s.png',  file_name)
+  ggsave(file_svg, width = width, height = height, dpi = 300)
   
-  ggsave(file_out, width = width, height = height, dpi = 300)
-  return(file_out)
+  # Clean up svg
+  rm_facet_clip(svg_in = file_svg, svg_out = file_svg)
   
+  # Render the svg into a png image with rsvg via magick
+  img <- magick::image_read_svg(file_svg, width = width*300)
+  magick::image_write(img, file_png)
+  
+  return(file_png)
+  
+}
+
+#' @description Remove clipping masks from facets
+#' @param file_in Filepath to svg output
+#' @param file_out Filepath to save
+rm_facet_clip <- function(svg_in, svg_out){
+  
+  # Read in svg
+  x <- read_xml(svg_in) 
+  
+  # Find defs with clipPath children
+  x_clips <- x %>%
+    xml_children() %>%
+    xml_ns_strip() %>% 
+    xml_find_all("//defs") %>%
+    xml_children() %>%
+    xml_find_all("//clipPath") 
+  
+  # Drop clipPaths around each tile
+  x_drop <- x_clips[4:length(x_clips)] # 4 is based on manual review of svg
+  # TODO: find clipPaths using shared attr
+  xml_remove(x_drop)
+  
+  # Add xmlns back in and save
+  xml_set_attr(x, attr = "xmlns", 'http://www.w3.org/2000/svg')
+  write_xml(x, file = svg_out)
+
 }
