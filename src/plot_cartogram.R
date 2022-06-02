@@ -199,9 +199,9 @@ combine_plots <- function(file_name, plot_left, plot_right, date_start, width, h
     # state tiles
    draw_plot(plot_right+theme(text = element_text(family = font_legend, color = text_color)),
              x = 1,
-             y = 0+plot_margin,
+             y = 0+plot_margin*2,
              height = 1- plot_margin*4, 
-             width = 1-(0.3+plot_margin*2),
+             width = 1-(0.3+plot_margin*3),
              hjust = 1,
              vjust = 0) +
     # add legend
