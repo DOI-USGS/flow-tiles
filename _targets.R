@@ -22,7 +22,7 @@ list(
   # Read in data from gage-flow-conditions pipeline output
   tar_target(
     dv,
-    read_csv("/Users/cnell/Documents/Projects/gage-conditions-gif/2_process/out/dv_stats_202205.csv", col_types = "cTnnnn")
+    read_csv("https://labs.waterdata.usgs.gov/visualizations/data/flow_conditions_202205.csv", col_types = "cTnnnn")
   ),
   # Bin percentile data 
   tar_target(
