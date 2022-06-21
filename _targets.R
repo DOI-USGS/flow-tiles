@@ -1,14 +1,10 @@
 library(targets)
 
 options(tidyverse.quiet = TRUE)
-tar_option_set(packages = c('tidyverse', 'lubridate', 'geofacet', 'cowplot','ggfx', 'showtext', 'magick', 'maps', 'svglite'))
+tar_option_set(packages = c('tidyverse', 'lubridate', 'geofacet', 'cowplot','ggfx', 'showtext', 'xml2'))
 
 source("src/prep_data.R")
 source("src/plot_cartogram.R")
-
-## dates for geofacet map
-date_start <- as.Date("2022-04-01")
-date_end <- as.Date("2022-05-01") # Need to keep as first date of following month for labeling purposes
 
 # wet to dry color scale
 pal_wetdry <- c("#002D5E", "#0C7182", "#6CB7B0", "#A7D2D8", "#E0D796", "#AF9423", "#A84E0B")
@@ -22,7 +18,15 @@ list(
   # Read in data from gage-flow-conditions pipeline output
   tar_target(
     dv,
-    read_csv("https://labs.waterdata.usgs.gov/visualizations/data/flow_conditions_202204.csv", col_types = "cTnnnn")
+    read_csv("https://labs.waterdata.usgs.gov/visualizations/data/flow_conditions_202205.csv", col_types = "cTnnnn")
+  ),
+  tar_target(
+    date_start,
+    as.Date(min(dv$dateTime))
+  ),
+  tar_target(
+    date_end,
+    as.Date(max(dv$dateTime))+1 # using firest date of next month for label positioning
   ),
   # Bin percentile data 
   tar_target(
@@ -83,11 +87,19 @@ list(
   # Combine charts and assemble final plot
   tar_target(
     flow_cartogram_svg,
-    combine_plots(file_out = "flow_cartogram.svg", 
+    combine_plots(file_svg = "flow_cartogram.svg", 
                   plot_left = plot_nat, 
                   plot_right = plot_cart, 
                   date_start,
                   width = 16, height = 9, color_bknd),
+    format = "file"
+  ),
+  # Remove facet clipping and save as png
+  tar_target(
+    flow_cartogram_png,
+    rm_facet_clip(svg_in = flow_cartogram_svg, 
+                  file_out = "flow_cartogram.png",
+                  width = 16),
     format = "file"
   )
 )
