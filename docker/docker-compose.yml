@@ -1,7 +1,7 @@
 version: "3.8"
 services:
   flow-tiles-pipeline:
-    image: code.usgs.gov:5001/jross/flow-tiles:latest
+    image: 807615458658.dkr.ecr.us-west-2.amazonaws.com/vizlab/flow-tiles:latest
     build:
       context: ..
       dockerfile: docker/Dockerfile

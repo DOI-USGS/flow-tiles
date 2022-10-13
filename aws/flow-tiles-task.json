@@ -1,0 +1,237 @@
+{
+    "ipcMode": null,
+    "executionRoleArn": "arn:aws:iam::807615458658:role/ecsTaskExecutionRole",
+    "containerDefinitions": [
+        {
+            "dnsSearchDomains": null,
+            "environmentFiles": null,
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "secretOptions": null,
+                "options": {
+                    "awslogs-group": "/ecs/fetch-daily-obs-task",
+                    "awslogs-region": "us-west-2",
+                    "awslogs-stream-prefix": "ecs"
+                }
+            },
+            "entryPoint": null,
+            "portMappings": [],
+            "command": [
+                "s3",
+                "cp",
+                "s3://ds-drb-data/ecs_test_input/reservoir_release_cache.csv",
+                "/input/"
+            ],
+            "linuxParameters": null,
+            "cpu": 0,
+            "environment": [],
+            "resourceRequirements": null,
+            "ulimits": null,
+            "dnsServers": null,
+            "mountPoints": [
+                {
+                    "readOnly": null,
+                    "containerPath": "/input",
+                    "sourceVolume": "input-mount"
+                }
+            ],
+            "workingDirectory": null,
+            "secrets": null,
+            "dockerSecurityOptions": null,
+            "memory": null,
+            "memoryReservation": null,
+            "volumesFrom": [],
+            "stopTimeout": null,
+            "image": "amazon/aws-cli:2.4.6",
+            "startTimeout": null,
+            "firelensConfiguration": null,
+            "disableNetworking": null,
+            "interactive": null,
+            "healthCheck": null,
+            "essential": false,
+            "links": null,
+            "hostname": null,
+            "extraHosts": null,
+            "pseudoTerminal": null,
+            "user": null,
+            "readonlyRootFilesystem": null,
+            "dockerLabels": null,
+            "systemControls": null,
+            "privileged": null,
+            "name": "download-release-cache"
+        },
+        {
+            "dnsSearchDomains": null,
+            "environmentFiles": null,
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "secretOptions": null,
+                "options": {
+                    "awslogs-group": "/ecs/fetch-daily-obs-task",
+                    "awslogs-region": "us-west-2",
+                    "awslogs-stream-prefix": "ecs"
+                }
+            },
+            "entryPoint": null,
+            "portMappings": [],
+            "command": [
+                "/bin/sh",
+                "-c",
+                "cp /input/reservoir_release_cache.csv /code/out/ && Rscript -e \"setwd('/code'); library(targets); tar_make()\" && cp -r /code/out/* /output"
+            ],
+            "linuxParameters": null,
+            "cpu": 0,
+            "environment": [],
+            "resourceRequirements": null,
+            "ulimits": null,
+            "dnsServers": null,
+            "mountPoints": [
+                {
+                    "readOnly": null,
+                    "containerPath": "/input",
+                    "sourceVolume": "input-mount"
+                },
+                {
+                    "readOnly": null,
+                    "containerPath": "/output",
+                    "sourceVolume": "output-mount"
+                }
+            ],
+            "workingDirectory": null,
+            "secrets": null,
+            "dockerSecurityOptions": null,
+            "memory": null,
+            "memoryReservation": null,
+            "volumesFrom": [],
+            "stopTimeout": null,
+            "image": "807615458658.dkr.ecr.us-west-2.amazonaws.com/pump/fetch-daily-obs:latest",
+            "startTimeout": null,
+            "firelensConfiguration": null,
+            "dependsOn": [
+                {
+                    "containerName": "download-release-cache",
+                    "condition": "SUCCESS"
+                }
+            ],
+            "disableNetworking": null,
+            "interactive": null,
+            "healthCheck": null,
+            "essential": false,
+            "links": null,
+            "hostname": null,
+            "extraHosts": null,
+            "pseudoTerminal": null,
+            "user": null,
+            "readonlyRootFilesystem": null,
+            "dockerLabels": null,
+            "systemControls": null,
+            "privileged": null,
+            "name": "run-pipeline"
+        },
+        {
+            "dnsSearchDomains": null,
+            "environmentFiles": null,
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "secretOptions": null,
+                "options": {
+                    "awslogs-group": "/ecs/fetch-daily-obs-task",
+                    "awslogs-region": "us-west-2",
+                    "awslogs-stream-prefix": "ecs"
+                }
+            },
+            "entryPoint": null,
+            "portMappings": [],
+            "command": [
+                "s3",
+                "sync",
+                "/output/",
+                "s3://ds-drb-data/ecs_test_output/pipeline_output/"
+            ],
+            "linuxParameters": null,
+            "cpu": 0,
+            "environment": [],
+            "resourceRequirements": null,
+            "ulimits": null,
+            "dnsServers": null,
+            "mountPoints": [
+                {
+                    "readOnly": null,
+                    "containerPath": "/output",
+                    "sourceVolume": "output-mount"
+                }
+            ],
+            "workingDirectory": null,
+            "secrets": null,
+            "dockerSecurityOptions": null,
+            "memory": null,
+            "memoryReservation": null,
+            "volumesFrom": [],
+            "stopTimeout": null,
+            "image": "amazon/aws-cli:2.4.6",
+            "startTimeout": null,
+            "firelensConfiguration": null,
+            "dependsOn": [
+                {
+                    "containerName": "run-pipeline",
+                    "condition": "SUCCESS"
+                }
+            ],
+            "disableNetworking": null,
+            "interactive": null,
+            "healthCheck": null,
+            "essential": true,
+            "links": null,
+            "hostname": null,
+            "extraHosts": null,
+            "pseudoTerminal": null,
+            "user": null,
+            "readonlyRootFilesystem": null,
+            "dockerLabels": null,
+            "systemControls": null,
+            "privileged": null,
+            "name": "upload-s3"
+        }
+    ],
+    "memory": "1024",
+    "taskRoleArn": "arn:aws:iam::807615458658:role/ecsTaskExecutionRole",
+    "family": "fetch-daily-obs-task",
+    "pidMode": null,
+    "requiresCompatibilities": [
+        "FARGATE"
+    ],
+    "networkMode": "awsvpc",
+    "runtimePlatform": {
+        "operatingSystemFamily": "LINUX",
+        "cpuArchitecture": null
+    },
+    "cpu": "256",
+    "inferenceAccelerators": [],
+    "proxyConfiguration": null,
+    "volumes": [
+        {
+            "fsxWindowsFileServerVolumeConfiguration": null,
+            "efsVolumeConfiguration": null,
+            "name": "input-mount",
+            "host": {
+                "sourcePath": null
+            },
+            "dockerVolumeConfiguration": null
+        },
+        {
+            "fsxWindowsFileServerVolumeConfiguration": null,
+            "efsVolumeConfiguration": null,
+            "name": "output-mount",
+            "host": {
+                "sourcePath": null
+            },
+            "dockerVolumeConfiguration": null
+        }
+    ],
+    "tags": [
+        {
+            "key": "CHS_Resource_Group",
+            "value": "aiml_subsidy"
+        }
+    ]
+}
