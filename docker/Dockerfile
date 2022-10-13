@@ -1,4 +1,4 @@
-ARG DOCKER_BASE_IMAGE=eddelbuettel/r2u:jammy
+ARG DOCKER_BASE_IMAGE=eddelbuettel/r2u:focal
 FROM ${DEVOPS_REGISTRY}${DOCKER_BASE_IMAGE}
 
 # Disable the annoying bell on WSL2
