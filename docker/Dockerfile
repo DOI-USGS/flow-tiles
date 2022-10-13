@@ -6,7 +6,7 @@ RUN sed -i 's/^# set bell-style none$/set bell-style none/' /etc/inputrc
 RUN echo 'set visualbell' >> /root/.vimrc
 
 # Add DOI CA to local CAs so that SSL can work over VPN
-COPY DOIRootCA2.crt /usr/local/share/ca-certificates
+COPY docker/DOIRootCA2.crt /usr/local/share/ca-certificates
 RUN update-ca-certificates
 ENV CURL_CA_BUNDLE /etc/ssl/certs/ca-certificates.crt
 
@@ -38,3 +38,8 @@ ENV DOCKER_BUILD_COMMIT_HASH ${DOCKER_BUILD_COMMIT_HASH}
 # suppress an annoying message from bspm
 RUN mkdir /usr/local/lib/R/etc/
 RUN echo 'options(bspm.sudo = TRUE)' >> /usr/local/lib/R/etc/Rprofile.site
+
+
+# Copy repo into image, so the image contains the code it needs to run on ECS.
+# Note: here / is root of build context, NOT file system.
+COPY / ./

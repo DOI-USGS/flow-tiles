@@ -3,7 +3,8 @@ services:
   flow-tiles-pipeline:
     image: code.usgs.gov:5001/jross/flow-tiles:latest
     build:
-      context: .
+      context: ..
+      dockerfile: docker/Dockerfile
   flow-tiles-pipeline-shortname:
     extends: flow-tiles-pipeline
     image: flow-tiles
