@@ -17,9 +17,7 @@
             "entryPoint": null,
             "portMappings": [],
             "command": [
-                "Rscript",
-                "-e",
-                "targets::tar_make()"
+                "aws/run_pipeline.sh"
             ],
             "linuxParameters": null,
             "cpu": 0,
@@ -41,13 +39,13 @@
             "memoryReservation": null,
             "volumesFrom": [],
             "stopTimeout": null,
-            "image": "807615458658.dkr.ecr.us-west-2.amazonaws.com/vizlab/flow-tiles",
+            "image": "807615458658.dkr.ecr.us-west-2.amazonaws.com/vizlab/flow-tiles:latest",
             "startTimeout": null,
             "firelensConfiguration": null,
             "disableNetworking": null,
             "interactive": null,
             "healthCheck": null,
-            "essential": false,
+            "essential": true,
             "links": null,
             "hostname": null,
             "extraHosts": null,
