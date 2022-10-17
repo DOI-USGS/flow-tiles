@@ -17,7 +17,8 @@
             "entryPoint": null,
             "portMappings": [],
             "command": [
-                "aws/run_pipeline.sh"
+                "bash",
+                "aws/run-pipeline.sh"
             ],
             "linuxParameters": null,
             "cpu": 0,
@@ -45,7 +46,7 @@
             "disableNetworking": null,
             "interactive": null,
             "healthCheck": null,
-            "essential": true,
+            "essential": false,
             "links": null,
             "hostname": null,
             "extraHosts": null,
@@ -75,7 +76,7 @@
                 "s3",
                 "cp",
                 "/output/flow_cartogram.png",
-                "s3://something/something/something/"
+                "s3://vizlab-data/flow-tiles-ecs/"
             ],
             "linuxParameters": null,
             "cpu": 0,
@@ -109,7 +110,7 @@
             "disableNetworking": null,
             "interactive": null,
             "healthCheck": null,
-            "essential": false,
+            "essential": true,
             "links": null,
             "hostname": null,
             "extraHosts": null,
@@ -124,7 +125,7 @@
     ],
     "memory": "1024",
     "taskRoleArn": "arn:aws:iam::807615458658:role/ecsTaskExecutionRole",
-    "family": "fetch-daily-obs-task",
+    "family": "vizlab-flow-tiles-task",
     "pidMode": null,
     "requiresCompatibilities": [
         "FARGATE"
