@@ -1,20 +1,15 @@
 {
-    "ipcMode": null,
     "executionRoleArn": "arn:aws:iam::807615458658:role/ecsTaskExecutionRole",
     "containerDefinitions": [
         {
-            "dnsSearchDomains": null,
-            "environmentFiles": null,
             "logConfiguration": {
                 "logDriver": "awslogs",
-                "secretOptions": null,
                 "options": {
                     "awslogs-group": "/ecs/flow-tiles-task",
                     "awslogs-region": "us-west-2",
                     "awslogs-stream-prefix": "ecs"
                 }
             },
-            "entryPoint": null,
             "portMappings": [],
             "command": [
                 "s3",
@@ -22,119 +17,61 @@
                 "s3://vizlab-flow-tiles/in/dv_stats.rds",
                 "/ephemeral/"
             ],
-            "linuxParameters": null,
             "cpu": 0,
             "environment": [],
-            "resourceRequirements": null,
-            "ulimits": null,
-            "dnsServers": null,
             "mountPoints": [
                 {
-                    "readOnly": null,
                     "containerPath": "/ephemeral",
                     "sourceVolume": "bind-mount"
                 }
             ],
-            "workingDirectory": null,
-            "secrets": null,
-            "dockerSecurityOptions": null,
-            "memory": null,
-            "memoryReservation": null,
             "volumesFrom": [],
-            "stopTimeout": null,
             "image": "amazon/aws-cli:2.4.6",
-            "startTimeout": null,
-            "firelensConfiguration": null,
-            "disableNetworking": null,
-            "interactive": null,
-            "healthCheck": null,
             "essential": false,
-            "links": null,
-            "hostname": null,
-            "extraHosts": null,
-            "pseudoTerminal": null,
-            "user": null,
-            "readonlyRootFilesystem": null,
-            "dockerLabels": null,
-            "systemControls": null,
-            "privileged": null,
             "name": "get-gage-conditions"
         },
         {
-            "dnsSearchDomains": null,
-            "environmentFiles": null,
             "logConfiguration": {
                 "logDriver": "awslogs",
-                "secretOptions": null,
                 "options": {
                     "awslogs-group": "/ecs/flow-tiles-task",
                     "awslogs-region": "us-west-2",
                     "awslogs-stream-prefix": "ecs"
                 }
             },
-            "entryPoint": null,
             "portMappings": [],
             "command": [
                 "bash",
                 "aws/run-pipeline.sh"
             ],
-            "linuxParameters": null,
             "cpu": 0,
             "environment": [],
-            "resourceRequirements": null,
-            "ulimits": null,
-            "dnsServers": null,
             "mountPoints": [
                 {
-                    "readOnly": null,
                     "containerPath": "/ephemeral",
                     "sourceVolume": "bind-mount"
                 }
             ],
-            "workingDirectory": null,
-            "secrets": null,
-            "dockerSecurityOptions": null,
-            "memory": null,
-            "memoryReservation": null,
             "volumesFrom": [],
-            "stopTimeout": null,
             "image": "807615458658.dkr.ecr.us-west-2.amazonaws.com/vizlab/flow-tiles:latest",
-            "startTimeout": null,
-            "firelensConfiguration": null,
             "dependsOn": [
                 {
                     "containerName": "get-gage-conditions",
                     "condition": "SUCCESS"
                 }
             ],
-            "disableNetworking": null,
-            "interactive": null,
-            "healthCheck": null,
             "essential": false,
-            "links": null,
-            "hostname": null,
-            "extraHosts": null,
-            "pseudoTerminal": null,
-            "user": null,
-            "readonlyRootFilesystem": null,
-            "dockerLabels": null,
-            "systemControls": null,
-            "privileged": null,
             "name": "build-viz"
         },
         {
-            "dnsSearchDomains": null,
-            "environmentFiles": null,
             "logConfiguration": {
                 "logDriver": "awslogs",
-                "secretOptions": null,
                 "options": {
                     "awslogs-group": "/ecs/flow-tiles-task",
                     "awslogs-region": "us-west-2",
                     "awslogs-stream-prefix": "ecs"
                 }
             },
-            "entryPoint": null,
             "portMappings": [],
             "command": [
                 "s3",
@@ -142,75 +79,44 @@
                 "/ephemeral/flow_cartogram.png",
                 "s3://vizlab-flow-tiles/out/"
             ],
-            "linuxParameters": null,
             "cpu": 0,
             "environment": [],
-            "resourceRequirements": null,
-            "ulimits": null,
-            "dnsServers": null,
             "mountPoints": [
                 {
-                    "readOnly": null,
                     "containerPath": "/ephemeral",
                     "sourceVolume": "bind-mount"
                 }
             ],
-            "workingDirectory": null,
-            "secrets": null,
-            "dockerSecurityOptions": null,
-            "memory": null,
-            "memoryReservation": null,
             "volumesFrom": [],
-            "stopTimeout": null,
             "image": "amazon/aws-cli:2.4.6",
-            "startTimeout": null,
-            "firelensConfiguration": null,
             "dependsOn": [
                 {
                     "containerName": "build-viz",
                     "condition": "SUCCESS"
                 }
             ],
-            "disableNetworking": null,
-            "interactive": null,
-            "healthCheck": null,
             "essential": true,
-            "links": null,
-            "hostname": null,
-            "extraHosts": null,
-            "pseudoTerminal": null,
-            "user": null,
-            "readonlyRootFilesystem": null,
-            "dockerLabels": null,
-            "systemControls": null,
-            "privileged": null,
             "name": "upload-result"
         }
     ],
     "memory": "1024",
     "taskRoleArn": "arn:aws:iam::807615458658:role/ecsTaskExecutionRole",
     "family": "vizlab-flow-tiles-task",
-    "pidMode": null,
     "requiresCompatibilities": [
         "FARGATE"
     ],
     "networkMode": "awsvpc",
     "runtimePlatform": {
-        "operatingSystemFamily": "LINUX",
-        "cpuArchitecture": null
+        "operatingSystemFamily": "LINUX"
     },
     "cpu": "256",
     "inferenceAccelerators": [],
-    "proxyConfiguration": null,
     "volumes": [
         {
-            "fsxWindowsFileServerVolumeConfiguration": null,
-            "efsVolumeConfiguration": null,
             "name": "bind-mount",
             "host": {
                 "sourcePath": null
-            },
-            "dockerVolumeConfiguration": null
+            }
         }
     ],
     "tags": [
