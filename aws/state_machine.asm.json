@@ -9,7 +9,7 @@
       "Parameters": {
         "LaunchType": "FARGATE",
         "Cluster": "arn:aws:ecs:us-west-2:807615458658:cluster/vizlab-cluster",
-        "TaskDefinition": "arn:aws:ecs:us-west-2:807615458658:task-definition/vizlab-gage-conditions-task:7",
+        "TaskDefinition": "arn:aws:ecs:us-west-2:807615458658:task-definition/vizlab-gage-conditions-task:12",
         "NetworkConfiguration": {
           "AwsvpcConfiguration": {
             "Subnets": [
@@ -23,7 +23,7 @@
       "Catch": [
         {
           "ErrorEquals": [ "States.ALL" ],
-          "Next": "Notify Failure"
+          "Next": "Notify gage-conditions Failure"
         }
       ]
     },
@@ -33,7 +33,7 @@
       "Parameters": {
         "LaunchType": "FARGATE",
         "Cluster": "arn:aws:ecs:us-west-2:807615458658:cluster/vizlab-cluster",
-        "TaskDefinition": "arn:aws:ecs:us-west-2:807615458658:task-definition/vizlab-flow-tiles-task:5",
+        "TaskDefinition": "arn:aws:ecs:us-west-2:807615458658:task-definition/vizlab-flow-tiles-task:11",
         "NetworkConfiguration": {
           "AwsvpcConfiguration": {
             "Subnets": [
@@ -47,7 +47,7 @@
       "Catch": [
         {
           "ErrorEquals": [ "States.ALL" ],
-          "Next": "Notify Failure"
+          "Next": "Notify flow-tiles Failure"
         }
       ]
     },
@@ -55,17 +55,26 @@
       "Type": "Task",
       "Resource": "arn:aws:states:::sns:publish",
       "Parameters": {
-        "Message": "AWS Fargate Task started by Step Functions succeeded",
-        "TopicArn": "arn:aws:sns:us-west-2:807615458658:PUMP-fetch-daily-obs-failure"
+        "Message": "The pipeline to build the flow-tiles visualization has run successfully. See the result: https://s3.console.aws.amazon.com/s3/buckets/vizlab-flow-tiles?region=us-west-2&prefix=out/&showversions=false",
+        "TopicArn": "arn:aws:sns:us-west-2:807615458658:vizlab-flow-tiles-pipeline"
       },
       "End": true
     },
-    "Notify Failure": {
+    "Notify gage-conditions Failure": {
       "Type": "Task",
       "Resource": "arn:aws:states:::sns:publish",
       "Parameters": {
-        "Message": "AWS Fargate Task started by Step Functions failed",
-        "TopicArn": "arn:aws:sns:us-west-2:807615458658:PUMP-fetch-daily-obs-failure"
+        "Message": "The pipeline to build the flow-tiles visualization has FAILED in the gage-conditions task. See logs in the developer account: https://us-west-2.console.aws.amazon.com/cloudwatch/home?region=us-west-2#logsV2:log-groups/log-group/$252Fecs$252Fgage-conditions-task",
+        "TopicArn": "arn:aws:sns:us-west-2:807615458658:vizlab-flow-tiles-pipeline"
+      },
+      "End": true
+    },
+    "Notify flow-tiles Failure": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::sns:publish",
+      "Parameters": {
+        "Message": "The pipeline to build the flow-tiles visualization has FAILED in the flow-tiles task. See logs in the developer account: https://us-west-2.console.aws.amazon.com/cloudwatch/home?region=us-west-2#logsV2:log-groups/log-group/$252Fecs$252Fflow-tiles-task",
+        "TopicArn": "arn:aws:sns:us-west-2:807615458658:vizlab-flow-tiles-pipeline"
       },
       "End": true
     }
