@@ -1,0 +1,73 @@
+{
+  "Comment": "Run gage-conditions and create the flow-tiles PNG",
+  "StartAt": "Run gage-conditions",
+  "TimeoutSeconds": 7200,
+  "States": {
+    "Run gage-conditions": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::ecs:runTask.sync",
+      "Parameters": {
+        "LaunchType": "FARGATE",
+        "Cluster": "arn:aws:ecs:us-west-2:807615458658:cluster/vizlab-cluster",
+        "TaskDefinition": "arn:aws:ecs:us-west-2:807615458658:task-definition/vizlab-gage-conditions-task:7",
+        "NetworkConfiguration": {
+          "AwsvpcConfiguration": {
+            "Subnets": [
+              "subnet-0b250cbaebb683b8d"
+            ],
+            "AssignPublicIp": "ENABLED"
+          }
+        }
+      },
+      "Next": "Create flow-tiles PNG",
+      "Catch": [
+        {
+          "ErrorEquals": [ "States.ALL" ],
+          "Next": "Notify Failure"
+        }
+      ]
+    },
+    "Create flow-tiles PNG": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::ecs:runTask.sync",
+      "Parameters": {
+        "LaunchType": "FARGATE",
+        "Cluster": "arn:aws:ecs:us-west-2:807615458658:cluster/vizlab-cluster",
+        "TaskDefinition": "arn:aws:ecs:us-west-2:807615458658:task-definition/vizlab-flow-tiles-task:5",
+        "NetworkConfiguration": {
+          "AwsvpcConfiguration": {
+            "Subnets": [
+              "subnet-0b250cbaebb683b8d"
+            ],
+            "AssignPublicIp": "ENABLED"
+          }
+        }
+      },
+      "Next": "Notify Success",
+      "Catch": [
+        {
+          "ErrorEquals": [ "States.ALL" ],
+          "Next": "Notify Failure"
+        }
+      ]
+    },
+    "Notify Success": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::sns:publish",
+      "Parameters": {
+        "Message": "AWS Fargate Task started by Step Functions succeeded",
+        "TopicArn": "arn:aws:sns:us-west-2:807615458658:PUMP-fetch-daily-obs-failure"
+      },
+      "End": true
+    },
+    "Notify Failure": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::sns:publish",
+      "Parameters": {
+        "Message": "AWS Fargate Task started by Step Functions failed",
+        "TopicArn": "arn:aws:sns:us-west-2:807615458658:PUMP-fetch-daily-obs-failure"
+      },
+      "End": true
+    }
+  }
+}
