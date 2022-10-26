@@ -122,8 +122,12 @@
     ],
     "tags": [
         {
-            "key": "CHS_Resource_Group",
-            "value": "aiml_subsidy"
+            "key": "wma:project_id",
+            "value": "vizlab"
+        },
+        {
+            "key": "wma:contact",
+            "value": "Jesse Ross jross@usgs.gov"
         }
     ]
 }
