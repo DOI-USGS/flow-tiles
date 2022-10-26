@@ -20,7 +20,7 @@
                 "s3",
                 "cp",
                 "s3://vizlab-flow-tiles/in/dv_stats.rds",
-                "/output/"
+                "/ephemeral/"
             ],
             "linuxParameters": null,
             "cpu": 0,
@@ -31,8 +31,8 @@
             "mountPoints": [
                 {
                     "readOnly": null,
-                    "containerPath": "/output",
-                    "sourceVolume": "output-mount"
+                    "containerPath": "/ephemeral",
+                    "sourceVolume": "bind-mount"
                 }
             ],
             "workingDirectory": null,
@@ -87,8 +87,8 @@
             "mountPoints": [
                 {
                     "readOnly": null,
-                    "containerPath": "/output",
-                    "sourceVolume": "output-mount"
+                    "containerPath": "/ephemeral",
+                    "sourceVolume": "bind-mount"
                 }
             ],
             "workingDirectory": null,
@@ -139,7 +139,7 @@
             "command": [
                 "s3",
                 "cp",
-                "/output/flow_cartogram.png",
+                "/ephemeral/flow_cartogram.png",
                 "s3://vizlab-flow-tiles/out/"
             ],
             "linuxParameters": null,
@@ -151,8 +151,8 @@
             "mountPoints": [
                 {
                     "readOnly": null,
-                    "containerPath": "/output",
-                    "sourceVolume": "output-mount"
+                    "containerPath": "/ephemeral",
+                    "sourceVolume": "bind-mount"
                 }
             ],
             "workingDirectory": null,
@@ -206,7 +206,7 @@
         {
             "fsxWindowsFileServerVolumeConfiguration": null,
             "efsVolumeConfiguration": null,
-            "name": "output-mount",
+            "name": "bind-mount",
             "host": {
                 "sourcePath": null
             },

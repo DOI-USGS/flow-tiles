@@ -29,7 +29,7 @@ list(
   tar_target(
     dv,
     #read_csv("https://labs.waterdata.usgs.gov/visualizations/data/flow_conditions_202209_full.csv", col_types = "cTnnnn")
-    readRDS("/output/dv_stats.rds")
+    readRDS("/ephemeral/dv_stats.rds")
   ),
   tar_target(
     date_start,
