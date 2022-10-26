@@ -52,6 +52,7 @@
                     "sourceVolume": "bind-mount"
                 }
             ],
+            "workingDirectory": "/flow-tiles",
             "volumesFrom": [],
             "image": "807615458658.dkr.ecr.us-west-2.amazonaws.com/vizlab/flow-tiles:latest",
             "dependsOn": [

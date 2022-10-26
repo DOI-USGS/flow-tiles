@@ -42,4 +42,4 @@ RUN echo 'options(bspm.sudo = TRUE)' >> /usr/local/lib/R/etc/Rprofile.site
 
 # Copy repo into image, so the image contains the code it needs to run on ECS.
 # Note: here / is root of build context, NOT file system.
-COPY / ./
+COPY / /flow-tiles/
