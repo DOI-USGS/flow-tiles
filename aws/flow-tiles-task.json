@@ -100,7 +100,7 @@
             "name": "upload-result"
         }
     ],
-    "memory": "1024",
+    "memory": "2048",
     "taskRoleArn": "arn:aws:iam::807615458658:role/ecsTaskExecutionRole",
     "family": "vizlab-flow-tiles-task",
     "requiresCompatibilities": [
