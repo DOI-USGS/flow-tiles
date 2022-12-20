@@ -228,7 +228,7 @@ combine_plots <- function(file_svg, plot_left, plot_right, date_start, width, he
                hjust = 0,
                vjust = 1) +
     # percentile info
-    draw_label("Flow percentile at USGS streamgages\nrelative to the historic daily record.", 
+    draw_label("Flow percentile at USGS streamgages\nrelative to the historic record.", 
                x = plot_margin*2,
                y = 0.25,
                hjust = 0,
