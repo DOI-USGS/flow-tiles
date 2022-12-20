@@ -108,7 +108,6 @@ list(
     flow_national_instagram_png,
     national_ig(file_svg = "flow_national_ig.png", 
                   plot_left = plot_nat, 
-                  plot_right = plot_cart, 
                   date_start,
                   width = 1080, height = 1080, color_bknd),
     format = "file"
@@ -118,7 +117,7 @@ list(
   tar_target(
     flow_cartogram_instagram_png,
     cartogram_ig(file_svg = "flow_cartogram_ig.png", 
-                plot_left = plot_nat, 
+                 plot_left = plot_nat,
                 plot_right = plot_cart, 
                 date_start,
                 width = 1080, height = 1080, color_bknd),

@@ -288,12 +288,11 @@ rm_facet_clip <- function(svg_in, file_out, width){
 #' @description Compose the final plot and annotate
 #' @param file_out Filepath to save to
 #' @param plot_left The national plot to position on the left
-#' @param plot_right The state tiles to position on the right
 #' @param date_start first day of focal month
 #' @param width Desired width of output plot
 #' @param height Desired height of output plot
 #' @param color_bknd Plot background color
-national_ig <- function(file_svg, plot_left, plot_right, date_start, width, height, color_bknd){
+national_ig <- function(file_svg, plot_left, date_start, width, height, color_bknd){
   plot_month <- lubridate::month(date_start, label = TRUE, abbr = FALSE)
   plot_year <- lubridate::year(date_start)
   
