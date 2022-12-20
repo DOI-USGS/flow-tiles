@@ -74,7 +74,7 @@ list(
     fips,
     get_state_fips()
   ),
-  # Plot flow tiemseries for states
+  # Plot flow timeseries for states
   tar_target(
     plot_cart,
     plot_state_cartogram(state_data = flow_state, fips, pal = pal_wetdry, usa_grid, color_bknd)
@@ -101,5 +101,28 @@ list(
                   file_out = "flow_cartogram.png",
                   width = 16),
     format = "file"
+  ),
+  
+  # Flow timeseries nationally - instagram 
+  tar_target(
+    flow_national_instagram_png,
+    national_ig(file_svg = "flow_national_ig.png", 
+                  plot_left = plot_nat, 
+                  plot_right = plot_cart, 
+                  date_start,
+                  width = 1080, height = 1080, color_bknd),
+    format = "file"
+  ),
+  
+  # Flow timeseries for states - instagram
+  tar_target(
+    flow_cartogram_instagram_png,
+    cartogram_ig(file_svg = "flow_cartogram_ig.png", 
+                plot_left = plot_nat, 
+                plot_right = plot_cart, 
+                date_start,
+                width = 1080, height = 1080, color_bknd),
+    format = "file"
   )
+  
 )
