@@ -77,8 +77,11 @@
             "command": [
                 "s3",
                 "cp",
-                "/ephemeral/flow_cartogram.png",
-                "s3://vizlab-flow-tiles/out/"
+                "--recursive",
+                "/ephemeral/",
+                "s3://vizlab-flow-tiles/out/",
+                "--exclude='*'",
+                "--include='flow_cartogram*'"
             ],
             "cpu": 0,
             "environment": [],
