@@ -45,16 +45,19 @@ theme_flowfacet <- function(base = 12, color_bknd, text_color){
 #' @param pal color palette for each bin level
 #' @param usa_grid the grid layout for plotting with
 #' @param color_bknd Plot background color
-plot_state_cartogram <- function(state_data, fips, pal, usa_grid, color_bknd){
+#' @param sigma_val Value assigned to sigma (blurring) in `ggfx::with_shawdow()`
+#' @param xoffset_val Value assigned to x_offset (offset of the shadow) in  `ggfx::with_shawdow()`
+#' @param yoffset_val Value assigned to y_offset (offset of the shadow) in  `ggfx::with_shawdow()`
+plot_state_cartogram <- function(state_data, fips, pal, usa_grid, color_bknd, sigma_val, xoffset_val, yoffset_val){
   state_data %>% 
     left_join(fips) %>% # to bind to cartogram grid
     ggplot(aes(date, prop)) +
     with_shadow(
       geom_area(aes(fill = percentile_cond)),
       colour = "black",
-      x_offset = 2,
-      y_offset = 2,
-      sigma = 5,
+      x_offset = xoffset_val,
+      y_offset = yoffset_val,
+      sigma = sigma_val,
       stack = TRUE,
       with_background = FALSE
     ) +
@@ -134,7 +137,9 @@ plot_national_area <- function(national_data, date_start, date_end, pal, color_b
 #' @param width Desired width of output plot
 #' @param height Desired height of output plot
 #' @param color_bknd Plot background color
-combine_plots <- function(file_svg, plot_left, plot_right, date_start, width, height, color_bknd){
+#' @param text_color Color of text in plot
+
+combine_plots <- function(file_svg, plot_left, plot_right, date_start, width, height, color_bknd, text_color){
   
   plot_month <- lubridate::month(date_start, label = TRUE, abbr = FALSE)
   plot_year <- lubridate::year(date_start)
@@ -144,8 +149,7 @@ combine_plots <- function(file_svg, plot_left, plot_right, date_start, width, he
   font_add_google(font_legend)
   showtext_opts(dpi = 300, regular.wt = 200, bold.wt = 700)
   showtext_auto(enable = TRUE)
-  
-  text_color <- "#444444"
+
   
   # usgs logo
   usgs_logo <- magick::image_read('in/usgs_logo.png') %>%
@@ -283,45 +287,15 @@ rm_facet_clip <- function(svg_in, file_out, width){
 
 }
 
-
-# national level flow time series  - instagram versioning (slide 1)
-#' @description Compose the final plot and annotate
-#' @param file_out Filepath to save to
-#' @param plot_left The national plot to position on the left
-#' @param date_start first day of focal month
-#' @param width Desired width of output plot
-#' @param height Desired height of output plot
-#' @param color_bknd Plot background color
-national_ig <- function(file_svg, plot_left, date_start, width, height, color_bknd){
-  plot_month <- lubridate::month(date_start, label = TRUE, abbr = FALSE)
-  plot_year <- lubridate::year(date_start)
-  
+restyle_legend <- function(plot_nat, enable_showtext, text_color){
   # import fonts
   font_legend <- 'Noto Sans Mono'
   font_add_google(font_legend)
   showtext_opts(dpi = 300, regular.wt = 200, bold.wt = 700)
-  showtext_auto(enable = TRUE)
-  
-  text_color <- "#444444"
-    
-  # usgs logo
-  usgs_logo <- magick::image_read('in/usgs_logo.png') %>%
-    magick::image_colorize(100, text_color)
-  
-  # streamflow title
-  title_flow <- magick::image_read('in/streamflow.png')
-  
-  plot_margin <- 0.025
-  
-  # background
-  canvas <- grid::rectGrob(
-    x = 0, y = 0, 
-    width = 16, height = 9,
-    gp = grid::gpar(fill = color_bknd, alpha = 1, col = color_bknd)
-  )
+  showtext_auto(enable = enable_showtext)
   
   # Restyle legend
-  plot_left <- plot_left +
+  plot_nat <- plot_nat +
     guides(fill = guide_colorsteps(
       title = "",
       nrow = 1,
@@ -335,9 +309,52 @@ national_ig <- function(file_svg, plot_left, date_start, width, height, color_bk
     )) +
     theme(legend.background = element_rect(fill = NA),
           text = element_text(family = font_legend, color = text_color, size = 6.5))
+}
+
+
+
+# national level flow time series  - instagram versioning (slide 1)
+#' @description Compose the final plot and annotate
+#' @param file_png Filepath to save to
+#' @param plot_left The national plot to position on the left
+#' @param date_start First day of focal month
+#' @param width Desired width of output plot
+#' @param height Desired height of output plot
+#' @param color_bknd Plot background color
+#' @param text_color Color of text in plot
+#' @param flow_label Flow percentile label placed above legend
+#' @param source_label Source label placed in bottom right of plot
+#' @param restyle_legend Restylizing legend national flow timeseries plot
+#' @param enable_showtext Enabling fonts 
+national_ig <- function(file_png, plot_nat, date_start, width, height, color_bknd,
+                        text_color, flow_label, source_label, restyle_legend, enable_showtext){
+  plot_month <- lubridate::month(date_start, label = TRUE, abbr = FALSE)
+  plot_year <- lubridate::year(date_start)
+  
+  # import fonts
+  font_legend <- 'Noto Sans Mono'
+  font_add_google(font_legend)
+  showtext_opts(dpi = 300, regular.wt = 200, bold.wt = 700)
+  showtext_auto(enable = enable_showtext)
+    
+  # usgs logo
+  usgs_logo <- magick::image_read('in/usgs_logo.png') %>%
+    magick::image_colorize(100, text_color) |> magick::image_scale('250x')
+  
+  # streamflow title
+  title_flow <- magick::image_read('in/streamflow.png')
+  
+  plot_margin <- 0.025
+  
+  # background
+  canvas <- grid::rectGrob(
+    x = 0, y = 0, 
+    width = 16, height = 9,
+    gp = grid::gpar(fill = color_bknd, alpha = 1, col = color_bknd)
+  )
   
   # Extract from plot
-  plot_legend <- get_legend(plot_left)
+  plot_legend <- get_legend(restyle_legend)
   
   # compose final plot
   ggdraw(ylim = c(0,1), 
@@ -348,10 +365,10 @@ national_ig <- function(file_svg, plot_left, date_start, width, height, color_bk
               height = 0.37, width = 0.37,
               hjust = 0, vjust = 1) +
     # national-level plot
-    draw_plot(plot_left+theme(legend.position = 'none',
+    draw_plot(restyle_legend+theme(legend.position = 'none',
                               axis.title.x.bottom = element_text(size = 14),
                               axis.title.x.top = element_text(size = 14),
-                              axis.text.x.bottom = element_text(size = 6),
+                              axis.text.x.bottom = element_text(size = 8),
                               axis.text.y = element_text(size = 8)),
               x = plot_margin*-10,
               y = 0.29,
@@ -373,7 +390,7 @@ national_ig <- function(file_svg, plot_left, date_start, width, height, color_bk
                color = text_color,
                lineheight = 1)  +
     # stylized streamflow title
-    draw_image(title_flow,
+    draw_image(title_flow |> magick::image_scale('800x'),
                x = plot_margin*2,
                y = 1-(3*plot_margin),
                height = 0.1,
@@ -381,7 +398,7 @@ national_ig <- function(file_svg, plot_left, date_start, width, height, color_bk
                hjust = 0,
                vjust = 1) +
     # percentile info
-    draw_label("Flow percentile at USGS streamgages relative\nto the historic record.",
+    draw_label(flow_label,
                x = plot_margin*7,
                y = 0.22,
                hjust = 0,
@@ -390,7 +407,7 @@ national_ig <- function(file_svg, plot_left, date_start, width, height, color_bk
                color = text_color,
                size = 6) +
     # add data source
-    draw_label("Data: USGS National Water Information System", 
+    draw_label(source_label, 
                x = 1-plot_margin*2, y = plot_margin*1, 
                fontface = "italic", 
                size = 5, 
@@ -402,8 +419,8 @@ national_ig <- function(file_svg, plot_left, date_start, width, height, color_bk
     draw_image(usgs_logo, x = plot_margin*2, y = plot_margin*1, width = 0.125, hjust = 0, vjust = 0, halign = 0, valign = 0)
   
   # Save and convert file
-  ggsave(file_svg, width = width, height = height, dpi = 300, units = c("px"))
-  return(file_svg)
+  ggsave(file_png, width = width, height = height, dpi = 300, units = c("px"))
+  return(file_png)
   
 }
 
@@ -411,13 +428,19 @@ national_ig <- function(file_svg, plot_left, date_start, width, height, color_bk
 # flow timeseries for states - instagram versioning (slide 2)
 #' @description Compose the final plot and annotate
 #' @param file_out Filepath to save to
-#' @param plot_left The national plot to position on the left
-#' @param plot_right The state tiles to position on the right
+#' @param plot_nat The national plot to position on the left
+#' @param plot_cart The state tiles to position on the right
 #' @param date_start first day of focal month
 #' @param width Desired width of output plot
 #' @param height Desired height of output plot
 #' @param color_bknd Plot background color
-cartogram_ig <- function(file_svg, plot_left, plot_right, date_start, width, height, color_bknd){
+#' @param text_color Color of text in plot
+#' @param flow_label Flow percentile label placed above legend
+#' @param source_label Source label placed in bottom right of plot
+#' @param restyle_legend Restylizing legend national flow timeseries plot
+#' @param enable_showtext Enabling fonts 
+cartogram_ig <- function(file_svg, plot_nat, plot_cart, date_start, width, height, color_bknd,
+                         text_color, flow_label, source_label, restyle_legend, enable_showtext){
   plot_month <- lubridate::month(date_start, label = TRUE, abbr = FALSE)
   plot_year <- lubridate::year(date_start)
   
@@ -425,13 +448,11 @@ cartogram_ig <- function(file_svg, plot_left, plot_right, date_start, width, hei
   font_legend <- 'Noto Sans Mono'
   font_add_google(font_legend)
   showtext_opts(dpi = 300, regular.wt = 200, bold.wt = 700)
-  showtext_auto(enable = TRUE)
+  showtext_auto(enable = enable_showtext)
   
-  text_color <- "#444444"
-    
   # usgs logo
   usgs_logo <- magick::image_read('in/usgs_logo.png') %>%
-    magick::image_colorize(100, text_color)
+    magick::image_colorize(100, text_color) |> magick::image_scale('250x')
   
   # streamflow title
   title_flow <- magick::image_read('in/streamflow.png')
@@ -445,24 +466,8 @@ cartogram_ig <- function(file_svg, plot_left, plot_right, date_start, width, hei
     gp = grid::gpar(fill = color_bknd, alpha = 1, col = color_bknd)
   )
   
-  # Restyle legend
-  plot_left <- plot_left +
-    guides(fill = guide_colorsteps(
-      title = "",
-      nrow = 1,
-      direction = 'horizontal',
-      label.position = "bottom",
-      barwidth = 12,
-      barheight = 0.6,
-      background = element_rect(fill = NA),
-      show.limits = TRUE,
-      even.steps = FALSE
-    )) +
-    theme(legend.background = element_rect(fill = NA),
-          text = element_text(family = font_legend, color = text_color, size = 6.5))
-  
-  # Extract from plot
-  plot_legend <- get_legend(plot_left)
+   # Extract from plot
+  plot_legend <- get_legend(restyle_legend)
   
   # compose final plot
   ggdraw(ylim = c(0,1), 
@@ -473,14 +478,12 @@ cartogram_ig <- function(file_svg, plot_left, plot_right, date_start, width, hei
               height = 0.37, width = 0.37,
               hjust = 0, vjust = 1) +
     # state tiles
-    draw_plot(plot_right+theme(text = element_text(family = font_legend, color = text_color),
+    draw_plot(plot_cart+theme(text = element_text(family = font_legend, color = text_color),
                                strip.text = element_text(size = 6, vjust = -3)),
               x = 1.09,
               y = -0.05,
               height = 1.27,
               width = 1.17,
-              # height = 1- plot_margin*0.01, 
-              # width = 2-(0.1+plot_margin*0.01),
               hjust = 1,
               vjust = 0) + 
     # draw title
@@ -493,7 +496,7 @@ cartogram_ig <- function(file_svg, plot_left, plot_right, date_start, width, hei
                color = text_color,
                lineheight = 1)  +
     # stylized streamflow title
-    draw_image(title_flow,
+    draw_image(title_flow |> magick::image_scale('800x'),
                x = plot_margin*2,
                y = 1-(3*plot_margin),
                height = 0.1,
@@ -507,7 +510,7 @@ cartogram_ig <- function(file_svg, plot_left, plot_right, date_start, width, hei
               height = 0.12 ,
               width = 0.02-plot_margin) +
     # percentile info
-    draw_label("Flow percentile at USGS streamgages relative\nto the historic record.",
+    draw_label(flow_label,
                x = plot_margin*7,
                y = 0.22,
                hjust = 0,
@@ -516,7 +519,7 @@ cartogram_ig <- function(file_svg, plot_left, plot_right, date_start, width, hei
                color = text_color,
                size = 6) +
     # add data source
-    draw_label("Data: USGS National Water Information System", 
+    draw_label(source_label, 
                x = 1-plot_margin*2, y = plot_margin*1, 
                fontface = "italic", 
                size = 5, 
