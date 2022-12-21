@@ -11,7 +11,15 @@ pal_wetdry <- c("#002D5E", "#0C7182", "#6CB7B0", "#A7D2D8", "#E0D796", "#AF9423"
 percentile_breaks = c(0, 0.05, 0.1, 0.25, 0.75, 0.9, 0.95, 1)
 percentile_labels <- c("Driest", "Drier", "Dry", "Normal","Wet","Wetter", "Wettest")
 color_bknd <- "#F4F4F4"
+  
 text_color = "#444444"
+
+# draw label text
+flow_label <- "Flow percentile at USGS streamgages relative\nto the historic record."
+source_label <- "Data: USGS National Water Information System"
+
+# font - enabeling showtext
+showtext = TRUE
 
 # to produce the flow cartogram, run tar_make() in the console
 list(
@@ -77,7 +85,8 @@ list(
   # Plot flow timeseries for states
   tar_target(
     plot_cart,
-    plot_state_cartogram(state_data = flow_state, fips, pal = pal_wetdry, usa_grid, color_bknd)
+    plot_state_cartogram(state_data = flow_state, fips, pal = pal_wetdry, usa_grid, color_bknd,  
+                         sigma_val = 5 , xoffset_val = 2, yoffset_val = 2) 
   ),
   # Plot flow timeseries nationally
   tar_target(
@@ -91,7 +100,7 @@ list(
                   plot_left = plot_nat, 
                   plot_right = plot_cart, 
                   date_start,
-                  width = 16, height = 9, color_bknd),
+                  width = 16, height = 9, color_bknd, text_color),
     format = "file"
   ),
   # Remove facet clipping and save as png
@@ -103,24 +112,52 @@ list(
     format = "file"
   ),
   
-  # Flow timeseries nationally - instagram 
+  # Plot flow timeseries for states with adjusted sigma and offset values - Instagram 
+  tar_target(
+    plot_cart_ig,
+    plot_state_cartogram(state_data = flow_state, fips, pal = pal_wetdry, usa_grid, color_bknd,  
+                         sigma_val = 2.5 , xoffset_val = 0.5, yoffset_val =0.5) 
+  ),
+  
+  # Restyling legend for Instagram dimensions
+  tar_target(
+    restyle_legend_ig,
+    restyle_legend(plot_nat, enable_showtext = showtext, text_color)
+  ),
+  
+  # Flow timeseries nationally - Instagram 
   tar_target(
     flow_national_instagram_png,
-    national_ig(file_svg = "flow_national_ig.png", 
-                  plot_left = plot_nat, 
-                  date_start,
-                  width = 1080, height = 1080, color_bknd),
+    national_ig(file_png = "flow_national_ig.png",
+                plot_nat,
+                date_start,
+                width = 1080, height = 1080, color_bknd,
+                text_color, flow_label, source_label, 
+                restyle_legend = restyle_legend_ig, 
+                enable_showtext = showtext),
+    format = "file"
+  ),
+
+  # Flow timeseries for states - Instagram
+  tar_target(
+    flow_cartogram_instagram_svg,
+    cartogram_ig(file_svg = "flow_cartogram_ig.svg", 
+                plot_nat,
+                plot_cart_ig, 
+                date_start,
+                width = 1080, height = 1080, color_bknd,
+                text_color, flow_label, source_label,
+                restyle_legend = restyle_legend_ig,
+                enable_showtext = showtext),
     format = "file"
   ),
   
-  # Flow timeseries for states - instagram
+  # Remove facet clipping and save as png 
   tar_target(
     flow_cartogram_instagram_png,
-    cartogram_ig(file_svg = "flow_cartogram_ig.png", 
-                 plot_left = plot_nat,
-                plot_right = plot_cart, 
-                date_start,
-                width = 1080, height = 1080, color_bknd),
+    rm_facet_clip(svg_in = flow_cartogram_instagram_svg, 
+                  file_out = "flow_cartogram_ig.png",
+                  width = 16),
     format = "file"
   )
   
