@@ -33,7 +33,7 @@
       "Parameters": {
         "LaunchType": "FARGATE",
         "Cluster": "arn:aws:ecs:us-west-2:807615458658:cluster/vizlab-cluster",
-        "TaskDefinition": "arn:aws:ecs:us-west-2:807615458658:task-definition/vizlab-flow-tiles-task:11",
+        "TaskDefinition": "arn:aws:ecs:us-west-2:807615458658:task-definition/vizlab-flow-tiles-task:14",
         "NetworkConfiguration": {
           "AwsvpcConfiguration": {
             "Subnets": [
