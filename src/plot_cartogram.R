@@ -287,6 +287,10 @@ rm_facet_clip <- function(svg_in, file_out, width){
 
 }
 
+#' @description Adjusting legend for flow timeseries national plot - Instagram 
+#' @param plot_nat  Plot flow timeseries nationally
+#' @param enable_showtext enabiling fonts
+#' @param text_color Color of text in plot
 restyle_legend <- function(plot_nat, enable_showtext, text_color){
   # import fonts
   font_legend <- 'Noto Sans Mono'
