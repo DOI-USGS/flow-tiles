@@ -1,7 +1,8 @@
 library(targets)
+library(showtext)
 
 options(tidyverse.quiet = TRUE)
-tar_option_set(packages = c('tidyverse', 'lubridate', 'geofacet', 'cowplot','ggfx', 'showtext', 'xml2'))
+tar_option_set(packages = c('tidyverse', 'lubridate', 'geofacet', 'cowplot','ggfx','showtext', 'xml2'))
 
 source("src/prep_data.R")
 source("src/plot_cartogram.R")
@@ -14,12 +15,15 @@ color_bknd <- "#F4F4F4"
   
 text_color = "#444444"
 
+# Enable font styling   
+font_legend <- 'Noto Sans Mono'
+font_add_google(font_legend)
+showtext_opts(dpi = 300, regular.wt = 200, bold.wt = 700)
+showtext_auto(enable = TRUE)
+
 # draw label text
 flow_label <- "Flow percentile at USGS streamgages relative\nto the historic record."
 source_label <- "Data: USGS National Water Information System"
-
-# font - enabeling showtext
-showtext = TRUE
 
 # to produce the flow cartogram, run tar_make() in the console
 list(
@@ -91,7 +95,8 @@ list(
   # Plot flow timeseries nationally
   tar_target(
     plot_nat,
-    plot_national_area(national_data = flow_national, pal = pal_wetdry, date_start, date_end, color_bknd)
+    plot_national_area(national_data = flow_national, pal = pal_wetdry, date_start, date_end, color_bknd,
+                       axis_title_size = 20, axis_text_size = 12, axis_title_bottom_size = 20, axis_title_top_size = 20)
   ),
   # Combine charts and assemble final plot
   tar_target(
@@ -100,7 +105,7 @@ list(
                   plot_left = plot_nat, 
                   plot_right = plot_cart, 
                   date_start,
-                  width = 16, height = 9, color_bknd, text_color),
+                  width = 16, height = 9, color_bknd, text_color, font_legend),
     format = "file"
   ),
   # Remove facet clipping and save as png
@@ -119,22 +124,29 @@ list(
                          sigma_val = 2.5 , xoffset_val = 0.5, yoffset_val =0.5) 
   ),
   
+  # Plot flow timeseries for national level with adjusted theme settings  - Instagram 
+  tar_target(
+    plot_nat_ig,
+    plot_national_area(national_data = flow_national, pal = pal_wetdry, date_start, date_end, color_bknd,
+                       axis_title_size = 14, axis_text_size = 6, axis_title_bottom_size = 10, axis_title_top_size = 12)
+  ),
+  
   # Restyling legend for Instagram dimensions
   tar_target(
     restyle_legend_ig,
-    restyle_legend(plot_nat, enable_showtext = showtext, text_color)
+    restyle_legend(plot_nat, enable_showtext = showtext, text_color, font_legend)
   ),
   
   # Flow timeseries nationally - Instagram 
   tar_target(
     flow_national_instagram_png,
     national_ig(file_png = "flow_national_ig.png",
-                plot_nat,
+                plot_nat_ig,
                 date_start,
                 width = 1080, height = 1080, color_bknd,
                 text_color, flow_label, source_label, 
                 restyle_legend = restyle_legend_ig, 
-                enable_showtext = showtext),
+                font_legend),
     format = "file"
   ),
 
@@ -148,7 +160,7 @@ list(
                 width = 1080, height = 1080, color_bknd,
                 text_color, flow_label, source_label,
                 restyle_legend = restyle_legend_ig,
-                enable_showtext = showtext),
+                font_legend),
     format = "file"
   ),
   
@@ -160,5 +172,7 @@ list(
                   width = 16),
     format = "file"
   )
-  
 )
+
+# Disable font styling - pipeline wont run, still need to sort out 
+#  showtext_auto(enable = FALSE)
