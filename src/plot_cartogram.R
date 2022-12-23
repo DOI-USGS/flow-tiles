@@ -400,7 +400,7 @@ national_ig <- function(file_png, plot_nat_ig, date_start, width, height, color_
                vjust = 1) +
     # percentile info
     draw_label(flow_label,
-               x = plot_margin*7,
+               x = (1-plot_margin)*0.18,
                y = 0.22,
                hjust = 0,
                vjust = 1,
@@ -409,7 +409,7 @@ national_ig <- function(file_png, plot_nat_ig, date_start, width, height, color_
                size = 6) +
     # add data source
     draw_label(source_label, 
-               x = 1-plot_margin*2, y = plot_margin*1, 
+               x = 1-plot_margin*2, y = plot_margin, 
                fontface = "italic", 
                size = 5, 
                hjust = 1, vjust = 0,
@@ -498,15 +498,15 @@ cartogram_ig <- function(file_svg, plot_nat, plot_cart, date_start, width, heigh
                width = 0.74,
                hjust = 0,
                vjust = 1) +
-    # add legend.
+    # add legend
     draw_plot(restyle_legend,
-              x = plot_margin*20,
+              x = (1-plot_margin)*0.5,
               y = 0.07,
               height = 0.12 ,
               width = 0.02-plot_margin) +
     # percentile info
     draw_label(flow_label,
-               x = plot_margin*7,
+               x = (1-plot_margin)*0.18,
                y = 0.22,
                hjust = 0,
                vjust = 1,
@@ -515,7 +515,7 @@ cartogram_ig <- function(file_svg, plot_nat, plot_cart, date_start, width, heigh
                size = 6) +
     # add data source
     draw_label(source_label, 
-               x = 1-plot_margin*2, y = plot_margin*1, 
+               x = 1-plot_margin*2, y = plot_margin, 
                fontface = "italic", 
                size = 5, 
                hjust = 1, vjust = 0,
