@@ -38,7 +38,7 @@ list(
   ),
   tar_target(
     date_end,
-    as.Date(max(dv$dateTime))+1 # using firest date of next month for label positioning
+    as.Date(max(dv$dateTime))+1 # using first date of next month for label positioning
   ),
   # Bin percentile data 
   tar_target(
@@ -134,7 +134,7 @@ list(
   # Restyling legend for Instagram dimensions
   tar_target(
     restyle_legend_ig,
-    restyle_legend(plot_nat, enable_showtext = showtext, text_color, font_legend)
+    restyle_legend(plot_nat, text_color, font_legend)
   ),
   
   # Flow timeseries nationally - Instagram 
@@ -173,6 +173,3 @@ list(
     format = "file"
   )
 )
-
-# Disable font styling - pipeline wont run, still need to sort out 
-#  showtext_auto(enable = FALSE)
