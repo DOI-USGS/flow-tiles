@@ -9,7 +9,7 @@ install.packages(c('targets', 'tidyverse', 'lubridate', 'geofacet', 'cowplot','g
 
 Running `tar_make()` will produce: 
 
-![flow_cartogram](flow_cartogram.png), ![flow_national_ig](flow_national_ig.png), ![flow_cartogram_ig](flow_cartogram_ig.png). 
+![flow_cartogram](flow_cartogram.png) ![flow_national_ig](flow_national_ig.png) ![flow_cartogram_ig](flow_cartogram_ig.png)
 
 
 To disable `showtext` font styling after running pipeline, run:
