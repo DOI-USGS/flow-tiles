@@ -1,0 +1,10 @@
+version: "3.8"
+services:
+  flow-tiles-pipeline:
+    image: 807615458658.dkr.ecr.us-west-2.amazonaws.com/vizlab/flow-tiles:latest
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+  flow-tiles-pipeline-shortname:
+    extends: flow-tiles-pipeline
+    image: flow-tiles

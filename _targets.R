@@ -1,7 +1,17 @@
 library(targets)
 
 options(tidyverse.quiet = TRUE)
-tar_option_set(packages = c('tidyverse', 'lubridate', 'geofacet', 'cowplot','ggfx', 'showtext', 'xml2'))
+tar_option_set(
+  packages = c(
+    'cowplot',
+    'geofacet',
+    'ggfx',
+    'lubridate',
+    'showtext',
+    'tidyverse',
+    'xml2'
+  )
+)
 
 source("src/prep_data.R")
 source("src/plot_cartogram.R")
@@ -18,7 +28,8 @@ list(
   # Read in data from gage-flow-conditions pipeline output
   tar_target(
     dv,
-    read_csv("https://labs.waterdata.usgs.gov/visualizations/data/flow_conditions_202211.csv", col_types = "cTnnnn")
+    #read_csv("https://labs.waterdata.usgs.gov/visualizations/data/flow_conditions_202209_full.csv", col_types = "cTnnnn")
+    readRDS("/ephemeral/dv_stats.rds")
   ),
   tar_target(
     date_start,
@@ -84,22 +95,34 @@ list(
     plot_nat,
     plot_national_area(national_data = flow_national, pal = pal_wetdry, date_start, date_end, color_bknd)
   ),
+  # Build a string for the prior month, e.g. 2022-11
+  tar_target(
+    prior_month,
+    strftime(Sys.Date() - lubridate::days(lubridate::day(Sys.Date())),
+             format = "%Y-%m")
+  ),
   # Combine charts and assemble final plot
   tar_target(
     flow_cartogram_svg,
-    combine_plots(file_svg = "flow_cartogram.svg", 
-                  plot_left = plot_nat, 
-                  plot_right = plot_cart, 
-                  date_start,
-                  width = 16, height = 9, color_bknd),
+    combine_plots(
+      file_svg = paste("flow_cartogram_", prior_month, ".svg", sep = ""), 
+      plot_left = plot_nat, 
+      plot_right = plot_cart, 
+      date_start,
+      width = 16,
+      height = 9,
+      color_bknd
+    ),
     format = "file"
   ),
   # Remove facet clipping and save as png
   tar_target(
     flow_cartogram_png,
-    rm_facet_clip(svg_in = flow_cartogram_svg, 
-                  file_out = "flow_cartogram.png",
-                  width = 16),
+    rm_facet_clip(
+      svg_in = flow_cartogram_svg, 
+      file_out = paste("flow_cartogram_", prior_month, ".png", sep = ""),
+      width = 16
+    ),
     format = "file"
   )
 )

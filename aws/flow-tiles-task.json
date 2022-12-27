@@ -1,0 +1,136 @@
+{
+    "executionRoleArn": "arn:aws:iam::807615458658:role/ecsTaskExecutionRole",
+    "containerDefinitions": [
+        {
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "/ecs/flow-tiles-task",
+                    "awslogs-region": "us-west-2",
+                    "awslogs-stream-prefix": "ecs"
+                }
+            },
+            "portMappings": [],
+            "command": [
+                "s3",
+                "cp",
+                "s3://vizlab-flow-tiles/in/dv_stats.rds",
+                "/ephemeral/"
+            ],
+            "cpu": 0,
+            "environment": [],
+            "mountPoints": [
+                {
+                    "containerPath": "/ephemeral",
+                    "sourceVolume": "bind-mount"
+                }
+            ],
+            "volumesFrom": [],
+            "image": "amazon/aws-cli:2.4.6",
+            "essential": false,
+            "name": "get-gage-conditions"
+        },
+        {
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "/ecs/flow-tiles-task",
+                    "awslogs-region": "us-west-2",
+                    "awslogs-stream-prefix": "ecs"
+                }
+            },
+            "portMappings": [],
+            "command": [
+                "bash",
+                "aws/run-pipeline.sh"
+            ],
+            "cpu": 0,
+            "environment": [],
+            "mountPoints": [
+                {
+                    "containerPath": "/ephemeral",
+                    "sourceVolume": "bind-mount"
+                }
+            ],
+            "workingDirectory": "/flow-tiles",
+            "volumesFrom": [],
+            "image": "807615458658.dkr.ecr.us-west-2.amazonaws.com/vizlab/flow-tiles:latest",
+            "dependsOn": [
+                {
+                    "containerName": "get-gage-conditions",
+                    "condition": "SUCCESS"
+                }
+            ],
+            "essential": false,
+            "name": "build-viz"
+        },
+        {
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "/ecs/flow-tiles-task",
+                    "awslogs-region": "us-west-2",
+                    "awslogs-stream-prefix": "ecs"
+                }
+            },
+            "portMappings": [],
+            "command": [
+                "s3",
+                "cp",
+                "--recursive",
+                "/ephemeral/",
+                "s3://vizlab-flow-tiles/out/",
+                "--exclude='*'",
+                "--include='flow_cartogram*'"
+            ],
+            "cpu": 0,
+            "environment": [],
+            "mountPoints": [
+                {
+                    "containerPath": "/ephemeral",
+                    "sourceVolume": "bind-mount"
+                }
+            ],
+            "volumesFrom": [],
+            "image": "amazon/aws-cli:2.4.6",
+            "dependsOn": [
+                {
+                    "containerName": "build-viz",
+                    "condition": "SUCCESS"
+                }
+            ],
+            "essential": true,
+            "name": "upload-result"
+        }
+    ],
+    "memory": "2048",
+    "taskRoleArn": "arn:aws:iam::807615458658:role/ecsTaskExecutionRole",
+    "family": "vizlab-flow-tiles-task",
+    "requiresCompatibilities": [
+        "FARGATE"
+    ],
+    "networkMode": "awsvpc",
+    "runtimePlatform": {
+        "operatingSystemFamily": "LINUX"
+    },
+    "cpu": "256",
+    "inferenceAccelerators": [],
+    "volumes": [
+        {
+            "name": "bind-mount",
+            "host": {
+                "sourcePath": null
+            }
+        }
+    ],
+    "tags": [
+        {
+            "key": "wma:project_id",
+            "value": "vizlab"
+        },
+        {
+            "key": "wma:contact",
+            "value": "Jesse Ross jross@usgs.gov"
+        }
+    ]
+}

@@ -6,3 +6,6 @@
 _targets/
 *.Rproj
 *.svg
+# vim swap files
+.*.swp
+.swp
