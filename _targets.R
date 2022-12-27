@@ -101,7 +101,7 @@ list(
   # Combine charts and assemble final plot
   tar_target(
     flow_cartogram_svg,
-    combine_plots(file_svg = "flow_cartogram.svg", 
+    combine_plots(file_svg = "out/flow_cartogram.svg", 
                   plot_left = plot_nat, 
                   plot_right = plot_cart, 
                   date_start,
@@ -112,7 +112,7 @@ list(
   tar_target(
     flow_cartogram_png,
     rm_facet_clip(svg_in = flow_cartogram_svg, 
-                  file_out = "flow_cartogram.png",
+                  file_out = "out/flow_cartogram.png",
                   width = 16),
     format = "file"
   ),
@@ -140,7 +140,7 @@ list(
   # Flow timeseries nationally - Instagram 
   tar_target(
     flow_national_instagram_png,
-    national_ig(file_png = "flow_national_ig.png",
+    national_ig(file_png = "out/flow_national_ig.png",
                 plot_nat_ig,
                 date_start,
                 width = 1080, height = 1080, color_bknd,
@@ -153,7 +153,7 @@ list(
   # Flow timeseries for states - Instagram
   tar_target(
     flow_cartogram_instagram_svg,
-    cartogram_ig(file_svg = "flow_cartogram_ig.svg", 
+    cartogram_ig(file_svg = "out/flow_cartogram_ig.svg", 
                 plot_nat,
                 plot_cart_ig, 
                 date_start,
@@ -168,7 +168,7 @@ list(
   tar_target(
     flow_cartogram_instagram_png,
     rm_facet_clip(svg_in = flow_cartogram_instagram_svg, 
-                  file_out = "flow_cartogram_ig.png",
+                  file_out = "out/flow_cartogram_ig.png",
                   width = 16),
     format = "file"
   )
