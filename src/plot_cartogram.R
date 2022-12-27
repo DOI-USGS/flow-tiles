@@ -143,7 +143,6 @@ plot_national_area <- function(national_data, date_start, date_end, pal, color_b
 #' @param color_bknd Plot background color
 #' @param text_color Color of text in plot
 #' @param font_legend font styling 
-
 combine_plots <- function(file_svg, plot_left, plot_right, date_start, width, height, color_bknd, text_color, font_legend){
   
   plot_month <- lubridate::month(date_start, label = TRUE, abbr = FALSE)
@@ -294,10 +293,9 @@ rm_facet_clip <- function(svg_in, file_out, width){
 
 #' @description Adjusting legend for flow timeseries national plot - Instagram 
 #' @param plot_nat  Plot flow timeseries nationally
-#' @param enable_showtext enabiling fonts
 #' @param text_color Color of text in plot
 #' @param font_legend font styling 
-restyle_legend <- function(plot_nat, enable_showtext, text_color, font_legend){
+restyle_legend <- function(plot_nat, text_color, font_legend){
   
   # Restyle legend
   plot_nat <- plot_nat +
@@ -319,8 +317,6 @@ restyle_legend <- function(plot_nat, enable_showtext, text_color, font_legend){
   
 }
 
-
-
 # national level flow time series  - instagram versioning (slide 1)
 #' @description Compose the final plot and annotate
 #' @param file_png Filepath to save to
@@ -332,7 +328,7 @@ restyle_legend <- function(plot_nat, enable_showtext, text_color, font_legend){
 #' @param text_color Color of text in plot
 #' @param flow_label Flow percentile label placed above legend
 #' @param source_label Source label placed in bottom right of plot
-#' @param restyle_legend Restylizing legend national flow timeseries plot
+#' @param restyle_legend re-stylizing legend national flow timeseries plot
 #' @param font_legend font styling 
 national_ig <- function(file_png, plot_nat_ig, date_start, width, height, color_bknd,
                         text_color, flow_label, source_label, restyle_legend, font_legend){
@@ -424,7 +420,6 @@ national_ig <- function(file_png, plot_nat_ig, date_start, width, height, color_
   return(file_png)
   
 }
-
 
 # flow timeseries for states - instagram versioning (slide 2)
 #' @description Compose the final plot and annotate
