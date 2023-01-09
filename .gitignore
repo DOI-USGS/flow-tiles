@@ -4,5 +4,4 @@
 .Ruserdata
 .DS_Store
 _targets/
-*.Rproj
 *.svg
