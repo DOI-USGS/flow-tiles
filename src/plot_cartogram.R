@@ -478,7 +478,7 @@ cartogram_ig <- function(file_svg, plot_nat, plot_cart, date_start, width, heigh
               vjust = 0) + 
     # draw title
     draw_label(sprintf('%s %s', plot_month, plot_year),
-               x = plot_margin*2, y = 1-plot_margin*1.2,
+               x = plot_margin*1.4, y = 1-plot_margin*1.2,
                size = 16,
                hjust = 0,
                vjust = 1,
@@ -487,7 +487,7 @@ cartogram_ig <- function(file_svg, plot_nat, plot_cart, date_start, width, heigh
                lineheight = 1)  +
     # stylized streamflow title
     draw_image(title_flow ,
-               x = plot_margin*2,
+               x = plot_margin*1.4,
                y = 1-(1.5*plot_margin),
                height = 0.16,
                width = 0.74,
