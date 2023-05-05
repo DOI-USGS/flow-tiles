@@ -1,0 +1,39 @@
+[
+  {
+    "name": "flow-tiles",
+    "organization": "U.S. Geological Survey",
+    "description": "A tile map showing a month of streamflow conditions across the U.S.",
+    "version": "main",
+    "status": "Production",
+    "permissions": {
+      "usageType": "openSource",
+      "licenses": [
+        {
+          "name": "Public Domain, CC0-1.0",
+          "URL": "https://github.com/USGS-VIZLAB/flow-tiles/blob/main/LICENSE.md"
+        }
+      ]
+    },
+    "homepageURL": "https://github.com/USGS-VIZLAB/flow-tiles/",
+    "downloadURL": "https://github.com/USGS-VIZLAB/flow-tiles/archive/refs/heads/main.zip",
+    "disclaimerURL": "https://github.com/USGS-VIZLAB/flow-tiles/blob/main/DISCLAIMER.md",
+    "repositoryURL": "https://github.com/USGS-VIZLAB/flow-tiles.git",
+    "vcs": "git",
+    "laborHours": 60,
+    "tags": [
+      "R",
+      "USGS",
+      "Vizlab"
+    ],
+    "languages": [
+      "R"
+    ],
+    "contact": {
+      "name": "Elmera Azadpour",
+      "email": "eazadpour@usgs.gov"
+    },
+    "date": {
+      "metadataLastUpdated": "2023-05-04"
+    }
+  }
+]
