@@ -4,7 +4,7 @@
     "organization": "U.S. Geological Survey",
     "description": "A tile map showing a month of streamflow conditions across the U.S.",
     "version": "main",
-    "status": "Development",
+    "status": "Production",
     "permissions": {
       "usageType": "openSource",
       "licenses": [
@@ -19,20 +19,21 @@
     "disclaimerURL": "https://github.com/USGS-VIZLAB/flow-tiles/blob/main/DISCLAIMER.md",
     "repositoryURL": "https://github.com/USGS-VIZLAB/flow-tiles.git",
     "vcs": "git",
-    "laborHours": -1,
+    "laborHours": 60,
     "tags": [
       "R",
-      "USGS"
+      "USGS",
+      "Vizlab"
     ],
     "languages": [
       "R"
     ],
     "contact": {
-      "name": "elmeraa-usgs",
-      "email": "FILL ME IN"
+      "name": "Elmera Azadpour",
+      "email": "eazadpour@usgs.gov"
     },
     "date": {
-      "metadataLastUpdated": "2023-04-07"
+      "metadataLastUpdated": "2023-05-04"
     }
   },
   {
