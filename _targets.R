@@ -23,7 +23,7 @@ showtext_auto(enable = TRUE)
 
 # draw label text
 flow_label <- "Flow percentile at USGS streamgages relative\nto the historic record."
-source_label <- "Data: USGS National Water Information System"
+source_label <- "Data: USGS Water Data for the Nation"
 
 # to produce the flow cartogram, run tar_make() in the console
 list(
@@ -105,7 +105,8 @@ list(
                   plot_left = plot_nat, 
                   plot_right = plot_cart, 
                   date_start,
-                  width = 16, height = 9, color_bknd, text_color, font_legend),
+                  width = 16, height = 9, color_bknd, text_color, font_legend,
+                  source_label),
     format = "file"
   ),
   # Remove facet clipping and save as png

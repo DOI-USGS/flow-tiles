@@ -143,7 +143,8 @@ plot_national_area <- function(national_data, date_start, date_end, pal, color_b
 #' @param color_bknd Plot background color
 #' @param text_color Color of text in plot
 #' @param font_legend font styling 
-combine_plots <- function(file_svg, plot_left, plot_right, date_start, width, height, color_bknd, text_color, font_legend){
+#' @param source_label Source label placed in bottom right of plot
+combine_plots <- function(file_svg, plot_left, plot_right, date_start, width, height, color_bknd, text_color, font_legend, source_label){
   
   plot_month <- lubridate::month(date_start, label = TRUE, abbr = FALSE)
   plot_year <- lubridate::year(date_start)
@@ -244,7 +245,7 @@ combine_plots <- function(file_svg, plot_left, plot_right, date_start, width, he
                fontfamily = font_legend,
                color = text_color) +
     # add data source
-    draw_label("Data: USGS National Water Information System", 
+    draw_label(source_label, 
                x = 1-plot_margin*2, y = plot_margin*2, 
                fontface = "italic", 
                size = 14, 
