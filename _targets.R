@@ -135,7 +135,19 @@ list(
   # Restyling legend for Instagram dimensions
   tar_target(
     restyle_legend_ig,
-    restyle_legend(plot_nat, text_color, font_legend)
+    restyle_legend(plot_nat, text_color, font_legend,
+                   barwidth = 12,
+                   barheight = 0.6,
+                   text_size = 6.5)
+  ),
+  
+  # Restyling legend for Instagram story dimensions
+  tar_target(
+    restyle_legend_ig_story,
+    restyle_legend(plot_nat, text_color, font_legend,
+                   barwidth = 36,
+                   barheight = 2.4,
+                   text_size = 25)
   ),
   
   # Flow timeseries nationally - Instagram 
@@ -172,5 +184,59 @@ list(
                   file_out = "out/flow_cartogram_ig.png",
                   width = 16),
     format = "file"
+  ),
+  
+  
+  # Pull vector of all state names across oconus
+  tar_target(
+    state_abbr_oconus,
+    flow_state %>% 
+      left_join(fips) %>%
+      split(.$abb) |> 
+      names()
+  ),
+  
+  # State name(s) of interest to filter by to plot state level cartogram in long format (9:16) for Instagram story
+  # For example, this can be filtered for WSC in CA or OR to post on their Instagram story 
+  tar_target(
+    state_abbr_of_interest,
+    c("CA", "OR")
+  ),
+  
+  # Filter oconus list to just states of interest 
+  tar_target(
+    state_abbr_filter,
+    # Filtering by California and Oregeon, for example
+    state_abbr_oconus[state_abbr_oconus == state_abbr_of_interest]
+  ),
+  
+  # List of state level plots of flow timeseries
+  tar_target(
+    plot_cart_state_ig_story_list,
+    plot_state_cartogram_long(state_data = flow_state, filter_states = state_abbr_filter,
+                              fips, pal = pal_wetdry, usa_grid, color_bknd,  
+                              sigma_val = 2.5 , xoffset_val = 0.5, yoffset_val =0.5,
+                              font_legend, text_color,
+                              date_end, date_start,
+                              axis_title_size = 26, axis_text_size = 18,
+                              axis_title_bottom_size = 22, axis_title_top_size = 24) 
+  ),
+  
+  # Plot state level facet in long format (9:16) for Instagram story 
+  tar_target(
+    plot_cart_state_ig_story,
+    plot_state_long(state_plot_list = plot_cart_state_ig_story_list,
+                    filter_states = state_abbr_filter,
+                    width = 9, height = 16 , dpi = 300,
+                    create_out_folder = "out/state_cartograms",
+                    background_color = "#F4F4F4",
+                    text_color = text_color,
+                    date_start = date_start,
+                    source_label = source_label,
+                    flow_label = flow_label,
+                    restyle_legend = restyle_legend_ig_story),
+    pattern = map(plot_cart_state_ig_story_list, state_abbr_filter),
+    format = 'file',
+    iteration = 'list'
   )
 )
