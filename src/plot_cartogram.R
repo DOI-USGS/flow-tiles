@@ -530,6 +530,7 @@ cartogram_ig <- function(file_svg, plot_nat, plot_cart, date_start, width, heigh
 
 # Create list of state level cartograms 
 #' @param state_data df with proportion of sites in each flow category by each state
+#' @param filter_state vector of states to filter making of cartograms by 
 #' @param fips State codes
 #' @param pal color palette for each bin level
 #' @param usa_grid the grid layout for plotting with
@@ -545,13 +546,23 @@ cartogram_ig <- function(file_svg, plot_nat, plot_cart, date_start, width, heigh
 #' @param axis_title_bottom_size manual adjustment of axis title bottom sizing in theming
 #' @param axis_title_top_size manual adjustment of axis title top sizing in theming
 #' @return list of individual state level cartograms 
-plot_state_cartogram_long <- function(state_data, fips, pal, usa_grid, color_bknd, sigma_val, xoffset_val, 
+plot_state_cartogram_long <- function(state_data, filter_states, fips, pal, usa_grid, color_bknd, sigma_val, xoffset_val, 
                                       yoffset_val, font_legend, text_color, date_end, date_start, 
                                       axis_title_size, axis_text_size, axis_title_bottom_size, axis_title_top_size){
   
   states_cart_list <- state_data %>% 
     left_join(fips) %>%
-    split(.$abb) %>%
+    split(.$abb) 
+  
+  filter_states_cart_list <- function(states_cart_list, filter_states) {
+    filtered_list <- map(states_cart_list, ~ filter(.x, abb %in% filter_states))
+    filtered_list <- keep(filtered_list, ~ nrow(.x) > 0)  # Keep only non-empty data frames
+    return(filtered_list)
+  }
+  
+  filtered_states_cart_list <- filter_states_cart_list(states_cart_list, filter_states)
+  
+  states_cart_list <- filtered_states_cart_list |> 
     map(~ ggplot(data = .x, aes(date, prop)) +
           with_shadow(
             geom_area(aes(fill = percentile_cond)),
@@ -624,14 +635,14 @@ plot_state_cartogram_long <- function(state_data, fips, pal, usa_grid, color_bkn
 #' @param restyle_legend Restylizing legend for state level plots 
 #' @param font_legend font styling 
 #' @return long format state cartograms in file format [state_name]_[month]_[year].png
-plot_state_long <- function(state_plot_list, state_names, width, height, 
+plot_state_long <- function(state_plot_list, filter_states, width, height, 
                                  dpi, create_out_folder,
                                  background_color, text_color,
                                  date_start, source_label, flow_label,
                                  restyle_legend) {
   
   # pull out indiviudal state names and state cartograms to `purr::map` by 
-  state_names <- pluck(state_names, 1)
+  state_names <- pluck(filter_states, 1)
   state_plot_list <- pluck(state_plot_list, 1)
   
   # The background canvas for your viz
@@ -666,7 +677,7 @@ plot_state_long <- function(state_plot_list, state_names, width, height,
     # Add main plot for each individual state
     draw_plot(state_plot_list,
               x = (1-plot_margin)*-0.04,
-              y = -0.02,
+              y = -0.01,
               height = 1.1,
               width = (1-plot_margin)*1.1) +
     # Draw title
@@ -707,13 +718,13 @@ plot_state_long <- function(state_plot_list, state_names, width, height,
     # Add legend
     draw_plot(restyle_legend,
               x = (1-plot_margin)*0.31,
-              y = -0.05,
+              y = -0.04,
               height = 0.42,
               width = 0.42-plot_margin) +
     # Percentile info
     draw_label(flow_label,
                x = (1-plot_margin)*0.13,
-               y = 0.24,
+               y = 0.25,
                hjust = 0,
                vjust = 1,
                fontfamily = font_legend,
