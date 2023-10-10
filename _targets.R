@@ -30,7 +30,7 @@ list(
   # Read in data from gage-flow-conditions pipeline output
   tar_target(
     dv,
-    read_csv("https://labs.waterdata.usgs.gov/visualizations/data/flow_conditions_202308.csv", col_types = "cTnnnn")
+    read_csv("https://labs.waterdata.usgs.gov/visualizations/data/flow_conditions_202309.csv", col_types = "cTnnnn")
   ),
   tar_target(
     date_start,
@@ -200,14 +200,14 @@ list(
   # For example, this can be filtered for WSC in CA or OR to post on their Instagram story 
   tar_target(
     state_abbr_of_interest,
-    c("CA", "OR")
+    c("NJ", "DE", "MD", "PA")
   ),
   
   # Filter oconus list to just states of interest 
   tar_target(
     state_abbr_filter,
     # Filtering by California and Oregeon, for example
-    state_abbr_oconus[state_abbr_oconus == state_abbr_of_interest]
+    state_abbr_oconus[state_abbr_oconus %in% state_abbr_of_interest]
   ),
   
   # List of state level plots of flow timeseries
