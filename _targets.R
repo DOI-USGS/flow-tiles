@@ -200,14 +200,14 @@ list(
   # For example, this can be filtered for WSC in CA or OR to post on their Instagram story 
   tar_target(
     state_abbr_of_interest,
-    c("CA", "OR")
+    c("NJ", "DE", "MD", "PA")
   ),
   
   # Filter oconus list to just states of interest 
   tar_target(
     state_abbr_filter,
     # Filtering by California and Oregeon, for example
-    state_abbr_oconus[state_abbr_oconus == state_abbr_of_interest]
+    state_abbr_oconus[state_abbr_oconus %in% state_abbr_of_interest]
   ),
   
   # List of state level plots of flow timeseries
