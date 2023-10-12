@@ -141,7 +141,16 @@ list(
                    text_size = 6.5)
   ),
   
-  # Restyling legend for Instagram story dimensions
+  # Restyling legend for Instagram square dimensions
+  tar_target(
+    restyle_legend_ig_square,
+    restyle_legend(plot_nat, text_color, font_legend,
+                   barwidth = 12,
+                   barheight = 0.8,
+                   text_size = 8)
+  ),
+  
+  # Restyling legend for Instagram story dimensions square
   tar_target(
     restyle_legend_ig_story,
     restyle_legend(plot_nat, text_color, font_legend,
@@ -200,7 +209,7 @@ list(
   # For example, this can be filtered for WSC in CA or OR to post on their Instagram story 
   tar_target(
     state_abbr_of_interest,
-    c("NJ", "DE", "MD", "PA")
+    c("DE", "MD")
   ),
   
   # Filter oconus list to just states of interest 
@@ -210,7 +219,7 @@ list(
     state_abbr_oconus[state_abbr_oconus %in% state_abbr_of_interest]
   ),
   
-  # List of state level plots of flow timeseries
+  # List of state level plots of flow timeseries - ig story version
   tar_target(
     plot_cart_state_ig_story_list,
     plot_state_cartogram_long(state_data = flow_state, filter_states = state_abbr_filter,
@@ -219,12 +228,12 @@ list(
                               font_legend, text_color,
                               date_end, date_start,
                               axis_title_size = 26, axis_text_size = 18,
-                              axis_title_bottom_size = 22, axis_title_top_size = 24) 
+                              axis_title_bottom_size = 22, axis_title_top_size = 24, plot_title_size = 55) 
   ),
-  
+
   # Plot state level facet in long format (9:16) for Instagram story 
   tar_target(
-    plot_cart_state_ig_story,
+    plot_cart_state_ig_story_png,
     plot_state_long(state_plot_list = plot_cart_state_ig_story_list,
                     filter_states = state_abbr_filter,
                     width = 9, height = 16 , dpi = 300,
@@ -235,6 +244,26 @@ list(
                     source_label = source_label,
                     flow_label = flow_label,
                     restyle_legend = restyle_legend_ig_story),
+    pattern = map(plot_cart_state_ig_story_list, state_abbr_filter),
+    format = 'file',
+    iteration = 'list'
+  ),
+  
+  # Plot state level facet in long format (1:1) for Instagram  
+  tar_target(
+    plot_cart_state_ig_square_png,
+    plot_state_square(state_plot_list = plot_cart_state_ig_story_list,
+                                     filter_states = state_abbr_filter,
+                                     axis_title_size = 14, axis_text_size = 6,
+                                     axis_title_bottom_size = 10, axis_title_top_size = 12, plot_title_size = 14, 
+                                     width = 1080, height = 1080 , dpi = 300,
+                                     create_out_folder = "out/state_cartograms",
+                                     background_color = "#F4F4F4",
+                                     text_color = text_color,
+                                     date_start = date_start,
+                                     source_label = source_label,
+                                     flow_label = flow_label,
+                                     restyle_legend = restyle_legend_ig_square),
     pattern = map(plot_cart_state_ig_story_list, state_abbr_filter),
     format = 'file',
     iteration = 'list'
