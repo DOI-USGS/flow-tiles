@@ -545,10 +545,11 @@ cartogram_ig <- function(file_svg, plot_nat, plot_cart, date_start, width, heigh
 #' @param axis_text_size manual adjustmet of axis text sizing in theming
 #' @param axis_title_bottom_size manual adjustment of axis title bottom sizing in theming
 #' @param axis_title_top_size manual adjustment of axis title top sizing in theming
+#' @param plot_title_size, manaual adjustment of plot title size
 #' @return list of individual state level cartograms 
 plot_state_cartogram_long <- function(state_data, filter_states, fips, pal, usa_grid, color_bknd, sigma_val, xoffset_val, 
                                       yoffset_val, font_legend, text_color, date_end, date_start, 
-                                      axis_title_size, axis_text_size, axis_title_bottom_size, axis_title_top_size){
+                                      axis_title_size, axis_text_size, axis_title_bottom_size, axis_title_top_size, plot_title_size){
   
   states_cart_list <- state_data %>% 
     left_join(fips) %>%
@@ -603,7 +604,7 @@ plot_state_cartogram_long <- function(state_data, filter_states, fips, pal, usa_
                                                   margin = margin(t = -7)),
                 plot.margin = margin(50, 50, 50, 50, "pt"),
                 legend.position = 'none',
-                plot.title = element_text(hjust = 0.5, size = 55, margin = margin(10, 0, 5, 0),
+                plot.title = element_text(hjust = 0.5, size = plot_title_size, margin = margin(10, 0, 5, 0),
                                           family = font_legend, color = text_color),
                 text = element_text(family = font_legend)
           ) +
@@ -735,9 +736,149 @@ plot_state_long <- function(state_plot_list, filter_states, width, height,
   
   out_folder <- dir.create(file.path(outfolder_month_year_path), showWarnings = FALSE)
   
-  filename <- paste0(outfolder_month_year_path, "/", state_names, "_", plot_month, "_", plot_year, ".png")
+  filename <- paste0(outfolder_month_year_path, "/", state_names, "_", plot_month, "_", plot_year, "_Story", ".png")
   
   # Save and convert file
   ggsave(filename, width = width, height = height, dpi = dpi) 
   return(filename)
+}
+
+
+#' @description Plot states of interest as cartogram in square format
+#' @param state_plot_list list of individual state cartograms
+#' @param state_names names of individual states to purr::map by
+#' @param create_out_folder sub folder path for state level pngs
+#' @param date_start first day of focal month
+#' @param date_emd last day of focal month
+#' @param width Desired width of output plot
+#' @param height Desired height of output plot
+#' @param background_color Plot background color
+#' @param text_color Color of text in plot
+#' @param flow_label Flow percentile label placed above legend
+#' @param source_label Source label placed in bottom right of plot
+#' @param restyle_legend Restylizing legend for state level plots 
+#' @param font_legend font styling 
+#' @param axis_title_size manual adjustment of axis title size in theming 
+#' @param axis_text_size manual adjustment of axis text sizing in theming
+#' @param axis_title_bottom_size manual adjustment of axis title bottom sizing in theming
+#' @param axis_title_top_size manual adjustment of axis title top sizing in theming
+#' @param plot_title_size, manual adjustment of plot title size
+plot_state_square <- function(state_plot_list, filter_states, 
+                              axis_title_size, axis_text_size, axis_title_bottom_size, axis_title_top_size, plot_title_size,
+                              width, height, dpi, create_out_folder, 
+                              background_color, text_color, date_start, source_label, flow_label, restyle_legend ){
+  
+  # pull out indiviudal state names and state cartograms to `purr::map` by 
+  state_names <- pluck(filter_states, 1)
+  state_plot_list <- pluck(state_plot_list, 1)
+  
+  # The background canvas for your viz
+  canvas <- grid::rectGrob(
+    x = 0, y = 0,
+    width = width, height = height,
+    gp = grid::gpar(fill = background_color, alpha = 1, col = background_color
+    )
+  )
+  
+  plot_margin =  0.025
+  
+  # pull out month and year
+  plot_month <- lubridate::month(date_start, label = TRUE, abbr = FALSE)
+  plot_year <- lubridate::year(date_start)
+  
+  # streamflow label
+  title_flow <- magick::image_read('in/streamflow.png') |> magick::image_scale('800x')
+  
+  # usgs logo
+  usgs_logo <- magick::image_read('in/usgs_logo.png') %>%
+    magick::image_colorize(100, text_color)
+  
+  # compose final plot
+  state_plts_square <- ggdraw(ylim = c(0,1),
+                       xlim = c(0,1)) +
+    # Background
+    draw_grob(canvas,
+              x = 0, y = 1,
+              height = 0.37, width = 0.37,
+              hjust = 0, vjust = 1) +
+    # Add main plot for each individual state
+    draw_plot(state_plot_list +
+                labs(x = "Day of month") + theme(legend.position = 'none',
+                                                 text = element_text(family = font_legend, color = text_color)) + 
+                theme(axis.text.y =
+                        element_text(size = axis_text_size,
+                                     vjust = c(1, 0),
+                                     hjust = 1),
+                      axis.title.x.bottom = element_text(size = axis_title_bottom_size,
+                                                         vjust = -1,
+                                                         margin = margin(t = 5)),
+                      axis.title.x.top = element_text(size = axis_title_top_size,
+                                                      vjust = 0,
+                                                      margin = margin(b = -5)),
+                      axis.text.x.bottom = element_text(size = axis_text_size,
+                                                        vjust = 1,
+                                                        # nudge labels up closer to bottom
+                                                        margin = margin(t = -5)),
+                      plot.margin = margin(50, 50, 50, 50, "pt"),
+                      legend.position = 'none',
+                      plot.title = element_text(size = plot_title_size, margin = margin(0, 0, -8, 0))
+                ),
+              x = (1-plot_margin)*-0.03,
+              y = 0.01,
+              height = 1.05,
+              width = (1-plot_margin)*1.05) +
+    # Draw title
+    draw_label(sprintf('%s %s', plot_month, plot_year),
+               x = plot_margin*1.7, y = 1-plot_margin*1.2,
+               size = 20,
+               hjust = 0,
+               vjust = 1,
+               fontfamily = font_legend,
+               color = text_color,
+               lineheight = 1) +
+    # Stylized streamflow title
+    draw_image(title_flow,
+               x = plot_margin*1.8,
+               y = 1-plot_margin*-1.5,
+               height = 0.36,
+               width = 0.94,
+               hjust = 0,
+               vjust = 1) + 
+    # Add legend
+    draw_plot(restyle_legend,
+              x = (1-plot_margin)*0.51,
+              y = 0.07,
+              height = 0.12 ,
+              width = 0.02-plot_margin) +
+    # percentile info
+    draw_label(flow_label,
+               x = (1-plot_margin)*0.205,
+               y = 0.22,
+               hjust = 0,
+               vjust = 1,
+               fontfamily = font_legend,
+               color = text_color,
+               size = 6) +
+    # add data source
+    draw_label(source_label,
+               x = 1-plot_margin*2, y = plot_margin,
+               fontface = "italic",
+               size = 5,
+               hjust = 1, vjust = 0,
+               fontfamily = font_legend,
+               color = text_color,
+               lineheight = 1.1) +
+    # add logo
+    draw_image(usgs_logo, x = plot_margin*2, y = plot_margin*1, width = 0.125, hjust = 0, vjust = 0, halign = 0, valign = 0)
+  
+  outfolder_month_year_path <- paste0(create_out_folder,"_", plot_month, "_", plot_year)
+  
+  out_folder <- dir.create(file.path(outfolder_month_year_path), showWarnings = FALSE)
+  
+  filename <- paste0(outfolder_month_year_path, "/", state_names, "_", plot_month, "_", plot_year, "_Square", ".png")
+  
+  # Save and convert file
+  ggsave(filename, width = width, height = height, dpi = dpi, units = c("px")) 
+  return(filename)
+  
 }
