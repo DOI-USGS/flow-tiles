@@ -244,11 +244,13 @@ list(
   
   #### explainer images and updated state ####
   
+  # updated color palette
   tar_target(
     explainer_pal,
     c("#002D5E", "#0C7182", "#6CB7B0", "#C0C0C0", "#F0DB85", "#AF9423", "#A84E0B")
   ),
   
+  # plot national data for explainer image (slight change in axis titles)
   tar_target(
     explainer_national_plot,
     prep_and_plot_national_data(national_data = flow_national, date_start, date_end, 
@@ -257,11 +259,13 @@ list(
                                 pal = explainer_pal)
   ),
   
+  # isolate legend from updated national plot
   tar_target(
     explainer_restyle_legend,
     restyle_legend_explainer(plot_nat = explainer_national_plot, barwidth = 12, barheight = 0.6, text_size = 6.5)
   ),
   
+  # cowplot national image png for instagram with explainer text
   tar_target(
     explainer_flow_national_ig_png,
     cowplot_national_explainer(plot_nat = explainer_national_plot, date_start, 
@@ -273,11 +277,13 @@ list(
     format = "file"
   ),
   
+  # edit national plot to serve as intro question background
   tar_target(
     explainer_intro_background,
     intro_background(national_data = flow_national, percentile_bin, pal = explainer_pal)
   ),
   
+  # cowplot intro question instagram png
   tar_target(
     intro_question_ig_png,
     intro_image(plot_nat_clean = explainer_intro_background, date_start, 
