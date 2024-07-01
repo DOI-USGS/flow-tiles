@@ -1,10 +1,10 @@
 #' @description Create tile grid for state map
 make_carto_grid <- function(){
   us_state_grid1 %>% 
+    as_tibble() %>%
     add_row(row = 7, col = 11, code = "PR", name = "Puerto Rico") %>% # add PR
     filter(code != "DC") # remove DC (only has 3 gages)
 }
-
 #' @description Pull state fips code to bind to state grid
 get_state_fips <- function(){
   maps::state.fips %>% 
@@ -109,7 +109,7 @@ plot_national_area <- function(national_data, date_start, date_end, pal, color_b
     theme_flowfacet(base = 12, color_bknd, text_color) +
     theme(axis.text.y = 
             element_text(size = axis_text_size,
-                         vjust = c(1, 0), 
+                         vjust = 1, 
                          hjust = 1),
           axis.title.x.bottom = element_text(size = axis_title_bottom_size,
                                              vjust = -1,
@@ -183,7 +183,7 @@ combine_plots <- function(file_svg, plot_left, plot_right, date_start, width, he
       barheight = 1,
       background = element_rect(fill = NA),
       show.limits = TRUE,
-      even.steps = FALSE
+      even.steps = TRUE
     )) +
       theme(legend.background = element_rect(fill = NA),
             text = element_text(family = font_legend, color = text_color))
@@ -309,7 +309,7 @@ restyle_legend <- function(plot_nat, text_color, font_legend, barwidth, barheigh
       barheight = barheight,
       background = element_rect(fill = NA),
       show.limits = TRUE,
-      even.steps = FALSE
+      even.steps = TRUE
     )) +
     theme(legend.background = element_rect(fill = NA),
           text = element_text(family = font_legend, color = text_color, size = text_size))
