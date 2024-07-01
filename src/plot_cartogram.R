@@ -1,10 +1,10 @@
 #' @description Create tile grid for state map
 make_carto_grid <- function(){
   us_state_grid1 %>% 
+    as_tibble() %>%
     add_row(row = 7, col = 11, code = "PR", name = "Puerto Rico") %>% # add PR
     filter(code != "DC") # remove DC (only has 3 gages)
 }
-
 #' @description Pull state fips code to bind to state grid
 get_state_fips <- function(){
   maps::state.fips %>% 
