@@ -2,7 +2,7 @@ library(targets)
 library(showtext)
 
 options(tidyverse.quiet = TRUE)
-tar_option_set(packages = c('tidyverse', 'lubridate', 'geofacet', 'cowplot','ggfx','showtext', 'xml2'))
+tar_option_set(packages = c('tidyverse', 'lubridate', 'geofacet', 'cowplot','ggfx','showtext', 'xml2', 'dataRetrieval', 'svglite', 'rsvg'))
 
 source("src/prep_data.R")
 source("src/plot_cartogram.R")
@@ -30,7 +30,7 @@ list(
   # Read in data from gage-flow-conditions pipeline output
   tar_target(
     dv,
-    read_csv("https://labs.waterdata.usgs.gov/visualizations/data/flow_conditions_202405.csv", col_types = "cTnnnn")
+    read_csv("https://labs.waterdata.usgs.gov/visualizations/data/flow_conditions_202406.csv", col_types = "cTnnnn")
   ),
   tar_target(
     date_start,
