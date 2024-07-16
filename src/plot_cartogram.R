@@ -97,20 +97,30 @@ plot_national_area <- function(national_data, date_start, date_end, pal, color_b
     ggplot(aes(date, prop)) +
     geom_area(aes(fill = percentile_bin)) +
     theme_classic() +
-    labs(x = lubridate::month(date_end - 30, label = TRUE, abbr = FALSE),
-         y="") +
+    labs(x = lubridate::month(date_end - 30, label = TRUE, abbr = FALSE), #
+         y="% of Streamgages") +
+    #labs(x = lubridate::month(date_end - 30, label = TRUE, abbr = FALSE),
+    #     y="") +
     scale_fill_manual(values = rev(pal)) +
-    scale_y_continuous(trans = "reverse",
-                       breaks = rev(c(0.05,0.5, 0.95)), 
-                       labels = c("0%","gages","100%"),
-                       sec.axis = dup_axis(
-                         labels = c("Dry", "", "Wet")
-                       )) +
+    scale_y_continuous(trans = "reverse", #
+                       breaks = rev(c(0, 0.25, 0.5, 0.75, 1)), #
+                       labels = c("0%", "25%", "50%", "75%", "100%") #
+    ) +
+    #scale_y_continuous(trans = "reverse",
+    #                   breaks = rev(c(0.05,0.5, 0.95)), 
+    #                   labels = c("0%","gages","100%"),
+    #                   sec.axis = dup_axis(
+    #                     labels = c("Dry", "", "Wet")
+    #                   )) +
     theme_flowfacet(base = 12, color_bknd, text_color) +
-    theme(axis.text.y = 
-            element_text(size = axis_text_size,
-                         vjust = c(1, 0), 
-                         hjust = 1),
+    theme(#axis.text.y = element_text(size = axis_text_size,
+          #                           vjust = c(1, 0), 
+          #                           hjust = 1),
+      axis.text.y = element_text(size = axis_text_size, #
+                                 vjust = 0.5, #c(1, 0), #
+                                 hjust = 1), #
+      axis.title.y = element_text(size = axis_title_bottom_size, #
+                                  margin = margin(r = 5)),
           axis.title.x.bottom = element_text(size = axis_title_bottom_size,
                                              vjust = -1,
                                              margin = margin(t = 5)),
@@ -182,8 +192,8 @@ combine_plots <- function(file_svg, plot_left, plot_right, date_start, width, he
       barwidth = 22,
       barheight = 1,
       background = element_rect(fill = NA),
-      show.limits = TRUE,
-      even.steps = FALSE
+      show.limits = TRUE#,
+      #even.steps = FALSE
     )) +
       theme(legend.background = element_rect(fill = NA),
             text = element_text(family = font_legend, color = text_color))
@@ -308,8 +318,8 @@ restyle_legend <- function(plot_nat, text_color, font_legend, barwidth, barheigh
       barwidth = barwidth,
       barheight = barheight,
       background = element_rect(fill = NA),
-      show.limits = TRUE,
-      even.steps = FALSE
+      show.limits = TRUE#,
+      #even.steps = FALSE
     )) +
     theme(legend.background = element_rect(fill = NA),
           text = element_text(family = font_legend, color = text_color, size = text_size))

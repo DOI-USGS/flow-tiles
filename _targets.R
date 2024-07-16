@@ -9,7 +9,8 @@ source("src/plot_cartogram.R")
 source("src/explainer_prep.R")
 
 # wet to dry color scale
-pal_wetdry <- c("#002D5E", "#0C7182", "#6CB7B0", "#A7D2D8", "#E0D796", "#AF9423", "#A84E0B")
+pal_wetdry <- c("#002D5E", "#0C7182", "#6CB7B0", "#C0C0C0", "#F0DB85", "#AF9423", "#A84E0B")
+  #c("#002D5E", "#0C7182", "#6CB7B0", "#A7D2D8", "#E0D796", "#AF9423", "#A84E0B")
 percentile_breaks = c(0, 0.05, 0.1, 0.25, 0.75, 0.9, 0.95, 1)
 percentile_labels <- c("Driest", "Drier", "Dry", "Normal","Wet","Wetter", "Wettest")
 color_bknd <- "#F4F4F4"
@@ -23,7 +24,8 @@ showtext_opts(dpi = 300, regular.wt = 200, bold.wt = 700)
 showtext_auto(enable = TRUE)
 
 # draw label text
-flow_label <- "Flow percentile at USGS streamgages relative\nto the historic record."
+flow_label <- "Streamflow percentile at USGS streamgages\nrelative to the historic record."
+#"Flow percentile at USGS streamgages relative\nto the historic record."
 source_label <- "Data: USGS Water Data for the Nation"
 
 # to produce the flow cartogram, run tar_make() in the console
@@ -163,8 +165,6 @@ list(
                 font_legend),
     format = "file"
   ),
-
-  #### explainer image - will be a new target or two ####
   
   # Flow timeseries for states - Instagram
   tar_target(
@@ -244,34 +244,12 @@ list(
   
   #### explainer images and updated state ####
   
-  # updated color palette
-  tar_target(
-    explainer_pal,
-    c("#002D5E", "#0C7182", "#6CB7B0", "#C0C0C0", "#F0DB85", "#AF9423", "#A84E0B")
-  ),
-  
-  # plot national data for explainer image (slight change in axis titles)
-  tar_target(
-    explainer_national_plot,
-    prep_and_plot_national_data(national_data = flow_national, date_start, date_end, 
-                                color_bknd, text_color, axis_text_size = 6, 
-                                axis_title_bottom_size = 10, axis_title_top_size = 12,
-                                pal = explainer_pal)
-  ),
-  
-  # isolate legend from updated national plot
-  tar_target(
-    explainer_restyle_legend,
-    restyle_legend_explainer(plot_nat = explainer_national_plot, barwidth = 12, barheight = 0.6, text_size = 6.5)
-  ),
-  
   # cowplot national image png for instagram with explainer text
   tar_target(
     explainer_flow_national_ig_png,
-    cowplot_national_explainer(plot_nat = explainer_national_plot, date_start, 
-                               flow_label = "Streamflow percentile at USGS streamgages\nrelative to the historic record.", 
-                               source_label, legend = explainer_restyle_legend,
-                               explainer_label = "Keep proportions in mind!\n\nMore blue = wetter conditions\nMore yellow/orange = drier conditions", 
+    cowplot_national_explainer(explainer_label = "HOT TIP: Keep proportions in mind!", 
+                               blue_label = "More blue = wetter conditions",
+                               orange_label = "More yellow/orange = drier conditions",
                                file_png = "out/explainer_flow_national_ig.png", 
                                width = 1080, height = 1080, font_legend, text_color),
     format = "file"
@@ -280,7 +258,7 @@ list(
   # edit national plot to serve as intro question background
   tar_target(
     explainer_intro_background,
-    intro_background(national_data = flow_national, percentile_bin, pal = explainer_pal)
+    intro_background(national_data = flow_national, percentile_bin, pal = pal_wetdry)
   ),
   
   # cowplot intro question instagram png

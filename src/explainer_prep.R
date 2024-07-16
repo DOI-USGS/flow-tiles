@@ -8,34 +8,22 @@
 #' @param axis_title_bottom_size manual adjustment of axis title size in theming 
 #' @param axis_title_top_size manual adjustment of top x axis title size in theming 
 #' @param pal color palette for each bin level
-prep_and_plot_national_data <- function(national_data, date_start, date_end, 
-                                        color_bknd, text_color, axis_text_size, 
-                                        axis_title_bottom_size, axis_title_top_size,
-                                        pal){
+prep_and_plot_national_data <- function(existing_plot, axis_text_size, 
+                                        axis_title_bottom_size, date_end,
+                                        axis_title_top_size
+                                        ){
   
-  # to label flow categories
-  sec_labels <- national_data  %>%
-    filter(date == max(national_data$date)) %>%
-    distinct(percentile_cond, prop) %>%
-    mutate(prop = cumsum(prop))
-  
-  plot_nat <- national_data %>% 
-    ggplot(aes(date, prop)) +
-    geom_area(aes(fill = percentile_bin)) +
-    theme_classic() +
-    labs(x = lubridate::month(date_end - 30, label = TRUE, abbr = FALSE),
+  plot_nat_explain <- existing_plot + 
+    labs(x = lubridate::month(date_end - 30, label = TRUE, abbr = FALSE), #
          y="% of Streamgages") +
-    scale_fill_manual(values = rev(pal)) +
-    scale_y_continuous(trans = "reverse",
-                       breaks = rev(c(0, 0.25, 0.5, 0.75, 1)), 
-                       labels = c("0%", "25%", "50%", "75%", "100%")
+    scale_y_continuous(trans = "reverse", #
+                       breaks = rev(c(0, 0.25, 0.5, 0.75, 1)), #
+                       labels = c("0%", "25%", "50%", "75%", "100%") #
     ) +
-    theme_flowfacet(base = 12, color_bknd, text_color) +
-    theme(axis.text.y = 
-            element_text(size = axis_text_size,
-                         vjust = 0.5, #c(1, 0), 
-                         hjust = 1),
-          axis.title.y = element_text(size = axis_title_bottom_size,
+    theme(axis.text.y = element_text(size = axis_text_size, #
+                                     vjust = 0.5, #c(1, 0), #
+                                     hjust = 1), #
+          axis.title.y = element_text(size = axis_title_bottom_size, #
                                       margin = margin(r = 5)),
           axis.title.x.bottom = element_text(size = axis_title_bottom_size,
                                              vjust = -1,
@@ -46,14 +34,51 @@ prep_and_plot_national_data <- function(national_data, date_start, date_end,
           axis.text.x.bottom = element_text(size = axis_text_size,
                                             vjust = 1,
                                             # nudge labels up closer to bottom
-                                            margin = margin(t = -7))) +
-    scale_x_date(breaks = seq.Date(date_start, date_end, "1 week"),
-                 position = "bottom",
-                 labels = lubridate::day(seq.Date(date_start, date_end, "1 week")),
-                 sec.axis = dup_axis(
-                   name = "National"
-                 )) +
-    coord_fixed(ratio = 28, clip = "off")
+                                            margin = margin(t = -7)))
+  
+  
+  # to label flow categories
+#  sec_labels <- national_data  %>%
+#    filter(date == max(national_data$date)) %>%
+#    distinct(percentile_cond, prop) %>%
+#    mutate(prop = cumsum(prop))
+  
+  # create the plot
+#  plot_nat <- national_data %>% 
+#    ggplot(aes(date, prop)) +
+#    geom_area(aes(fill = percentile_bin)) +
+#    theme_classic() +
+#    labs(x = lubridate::month(date_end - 30, label = TRUE, abbr = FALSE), #
+#         y="% of Streamgages") + #
+#    scale_fill_manual(values = rev(pal)) +
+#    scale_y_continuous(trans = "reverse", #
+#                       breaks = rev(c(0, 0.25, 0.5, 0.75, 1)), #
+#                       labels = c("0%", "25%", "50%", "75%", "100%") #
+#    ) +
+#    theme_flowfacet(base = 12, color_bknd, text_color) +
+#    theme(axis.text.y = 
+#            element_text(size = axis_text_size, #
+#                         vjust = 0.5, #c(1, 0), #
+#                         hjust = 1), #
+#          axis.title.y = element_text(size = axis_title_bottom_size, #
+#                                      margin = margin(r = 5)), #
+#          axis.title.x.bottom = element_text(size = axis_title_bottom_size,
+#                                             vjust = -1,
+#                                             margin = margin(t = 5)),
+#          axis.title.x.top = element_text(size = axis_title_top_size,
+#                                          vjust = 0,
+#                                          margin = margin(b = -5)),
+#          axis.text.x.bottom = element_text(size = axis_text_size,
+#                                            vjust = 1,
+#                                            # nudge labels up closer to bottom
+#                                            margin = margin(t = -7))) +
+#    scale_x_date(breaks = seq.Date(date_start, date_end, "1 week"),
+#                 position = "bottom",
+#                 labels = lubridate::day(seq.Date(date_start, date_end, "1 week")),
+#                 sec.axis = dup_axis(
+#                   name = "National"
+#                 )) +
+#    coord_fixed(ratio = 28, clip = "off")
   
 }
 
@@ -94,22 +119,10 @@ restyle_legend_explainer <- function(plot_nat, barwidth, barheight, text_size){
 #' @param height height of final png
 #' @param font_legend font used for legend text
 #' @param text_color color used for viz text
-cowplot_national_explainer <- function(plot_nat, date_start, flow_label, 
-                                       source_label, legend, explainer_label, file_png, 
-                                       width, height, font_legend, text_color){
+cowplot_national_explainer <- function(explainer_label, file_png, 
+                                       width, height, font_legend, text_color, blue_label, orange_label){
 
-  plot_month <- lubridate::month(date_start, label = TRUE, abbr = FALSE)
-  plot_year <- lubridate::year(date_start)
-  
-  # usgs logo
-  usgs_logo <- magick::image_read('in/usgs_logo.png') %>%
-    magick::image_colorize(100, text_color) |> magick::image_scale('250x')
-  
-  # streamflow title
-  title_flow <- magick::image_read('in/streamflow.png') |> magick::image_scale('800x')
-  
   plot_margin <- 0.025
-  
   # background
   canvas <- grid::rectGrob(
     x = 0, y = 0, 
@@ -145,72 +158,34 @@ cowplot_national_explainer <- function(plot_nat, date_start, flow_label,
                  curvature = 0, angle = 100, ncp = 10,
                  color = "#002D5E", linewidth = 0.2))
   
-  
-  # # Extract from plot
-  # plot_legend <- get_legend(restyle_legend)
-  # 
+  national_plot_png <- magick::image_read("out/flow_national_ig.png")
   # compose final plot
   ggdraw(ylim = c(0,1), 
          xlim = c(0,1)) +
     # a white background
     draw_grob(canvas,
               x = 0, y = 1,
-              height = 0.37, width = 0.37,
+              height = 1, width = 1,
               hjust = 0, vjust = 1) +
-    # national-level plot
-    draw_plot(plot_nat+ labs(x = "Day of month") + theme(legend.position = 'none',
-                                                         text = element_text(family = font_legend, color = text_color)),
-              x = (1-plot_margin)*0.08,
-              y = 0.27,
-              height = 0.54 ,
-              width = (1-plot_margin)*0.8) +
-    # add legend
-    draw_plot(legend,
-              x = (1-plot_margin)*0.5,
-              y = 0.07,
-              height = 0.12 ,
-              width = 0.02-plot_margin) +
-    # draw title
-    draw_label(sprintf('%s %s', plot_month, plot_year),
-               x = plot_margin*2, y = 1-plot_margin*1.2,
-               size = 16,
-               hjust = 0,
-               vjust = 1,
-               fontfamily = font_legend,
-               color = text_color,
-               lineheight = 1)  +
-    # stylized streamflow title
-    draw_image(title_flow ,
-               x = plot_margin*2,
-               y = 1-(1.5*plot_margin),
-               height = 0.16,
-               width = 0.74,
-               hjust = 0,
-               vjust = 1) +
-    # percentile info
-    draw_label(flow_label,
-               x = (1-plot_margin)*0.18,
-               y = 0.22,
-               hjust = 0,
-               vjust = 1,
-               fontfamily = font_legend,
-               color = text_color,
-               size = 6) +
-    # add data source
-    draw_label(source_label, 
-               x = 1-plot_margin*2, y = plot_margin, 
-               fontface = "italic", 
-               size = 5, 
-               hjust = 1, vjust = 0,
-               fontfamily = font_legend,
-               color = text_color,
-               lineheight = 1.1) +
+    draw_image(national_plot_png, x = 0, y = 0, width = 1, hjust = 0, vjust = 0, halign = 0, valign = 0)+
     draw_label(explainer_label, 
-               x = 0.5, y = 1-plot_margin*2, 
+               x = 0.5, y = 0.96, 
                size = 5.5, 
                hjust = 0, vjust = 1,
                fontfamily = font_legend,
-               color = text_color) +
+               color = "#000000")+ #text_color) +
+    draw_label(blue_label, 
+               x = 0.5, y = 0.91, 
+               size = 5.5, 
+               hjust = 0, vjust = 1,
+               fontfamily = font_legend,
+               color = "#002D5E")+
+    draw_label(orange_label, 
+               x = 0.5, y = 0.88, 
+               size = 5.5, 
+               hjust = 0, vjust = 1,
+               fontfamily = font_legend,
+               color = "#A84E0B")+
     draw_label("Low\nStreamflow",
                x = 0.84, y = 0.355, 
                size = 5.5, 
@@ -223,8 +198,8 @@ cowplot_national_explainer <- function(plot_nat, date_start, flow_label,
                hjust = 0.5, vjust = 1,
                fontfamily = font_legend,
                color = "#002D5E") +
-    draw_label("Normal Range",
-               x = 0.88, y = 0.5, 
+    draw_label("Typical\nStreamflow",
+               x = 0.855, y = 0.5, 
                size = 5.5, 
                hjust = 0.5, vjust = 1,
                fontfamily = font_legend,
@@ -236,11 +211,11 @@ cowplot_national_explainer <- function(plot_nat, date_start, flow_label,
               width = 0.05,
               hjust = 0,
               vjust = 0.5)+
-    draw_plot(normal_range_arrow, # for normal range
+    draw_plot(normal_range_arrow, # for typical streamflow
               x = 0.755, 
               y = 0.495,
               height = 0.035, 
-              width = 0.04,
+              width = 0.05,
               hjust = 0,
               vjust = 0.5)+
     draw_plot(low_range_arrow, # for low streamflow
@@ -249,10 +224,7 @@ cowplot_national_explainer <- function(plot_nat, date_start, flow_label,
               height = 0.035, 
               width = 0.055,
               hjust = 0,
-              vjust = 0.5)+
-    # add logo
-    draw_image(usgs_logo, x = plot_margin*2, y = plot_margin*1, width = 0.125, hjust = 0, vjust = 0, halign = 0, valign = 0)
-  
+              vjust = 0.5)
   
   # Save and convert file
   ggsave(file_png, width = width, height = height, dpi = 300, units = c("px"))
@@ -332,10 +304,10 @@ intro_image <- function(plot_nat_clean, date_start, font_legend, width, height, 
                width = 0.74,
                hjust = 0,
                vjust = 1) +
-    draw_label(sprintf("How do %s's\nstreamflow\nconditions\ncompare to the\npast?", plot_month),
+    draw_label(sprintf("How did %s's\nstreamflow\ncompare to the\npast?", plot_month),
                x = 0.05,
                y = 0.5,
-               size = 28,
+               size = 26,
                hjust = 0,
                vjust = 0.5,
                fontfamily = font_legend,
