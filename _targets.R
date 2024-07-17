@@ -244,7 +244,7 @@ list(
   
   #### explainer images and updated state ####
   
-  # cowplot national image png for instagram with explainer text
+  # cowplot the national plot png for instagram with explainer text
   tar_target(
     explainer_flow_national_ig_png,
     cowplot_national_explainer(explainer_label = "HOT TIP: Keep proportions in mind!", 
@@ -255,13 +255,13 @@ list(
     format = "file"
   ),
   
-  # edit national plot to serve as intro question background
+  # create national plot with a lower alpha value to serve as intro question background
   tar_target(
     explainer_intro_background,
-    intro_background(national_data = flow_national, percentile_bin, pal = pal_wetdry)
+    intro_background(national_data = flow_national, percentile_bin, pal = pal_wetdry) 
   ),
   
-  # cowplot intro question instagram png
+  # cowplot the intro question instagram png
   tar_target(
     intro_question_ig_png,
     intro_image(plot_nat_clean = explainer_intro_background, date_start, 
