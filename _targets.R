@@ -252,7 +252,12 @@ list(
                                blue_label = "More blue = wetter conditions",
                                orange_label = "More yellow/orange = drier conditions",
                                file_png = "out/explainer_flow_national_ig.png", 
-                               width = 1080, height = 1080, font_legend, text_color),
+                               width = 1080, height = 1080, font_legend, text_color,
+                               low_col = "#A84E0B", high_col = "#002D5E", 
+                               low_lab = "Low\nStreamflow", 
+                               high_lab = "High\nStreamflow", 
+                               typ_lab = "Typical\nStreamflow",
+                               typ_lab_ypos = 0.5, typ_arr_ypos = 0.495),
     format = "file"
   ),
   

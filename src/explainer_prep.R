@@ -8,8 +8,9 @@
 #' @param blue_label label for wet condition interpretation tip
 #' @param orange_label label for dry condition interpretation tip
 cowplot_national_explainer <- function(explainer_label, file_png, national_plot_png,
-                                       width, height, font_legend, text_color, blue_label, orange_label){
-
+                                       width, height, font_legend, text_color, blue_label, orange_label,
+                                       low_col, high_col, low_lab, high_lab, typ_lab, typ_lab_ypos, typ_arr_ypos){
+# typ_lab_ypos = 0.5, typ_arr_ypos = 0.495
   plot_margin <- 0.025
   # background
   canvas <- grid::rectGrob(
@@ -35,7 +36,7 @@ cowplot_national_explainer <- function(explainer_label, file_png, national_plot_
                      xend = 11, yend = 3),
                  arrow = grid::arrow(length = unit(0.2, 'lines')), 
                  curvature = 0, angle = 100, ncp = 10,
-                 color = "#A84E0B", linewidth = 0.2))
+                 color = low_col, linewidth = 0.2))
   
   (high_range_arrow <- ggplot() + 
       theme_void()+
@@ -44,7 +45,7 @@ cowplot_national_explainer <- function(explainer_label, file_png, national_plot_
                      xend = 11, yend = 3),
                  arrow = grid::arrow(length = unit(0.2, 'lines')), 
                  curvature = 0, angle = 100, ncp = 10,
-                 color = "#002D5E", linewidth = 0.2))
+                 color = high_col, linewidth = 0.2))
   
   og_plot_png <- magick::image_read(national_plot_png)
   # compose final plot
@@ -65,33 +66,33 @@ cowplot_national_explainer <- function(explainer_label, file_png, national_plot_
                size = 5.5, 
                hjust = 0, vjust = 1,
                fontfamily = font_legend,
-               color = "#000000")+ #text_color) +
+               color = "#000000")+ 
     draw_label(blue_label, 
                x = 0.5, y = 0.91, 
                size = 5.5, 
                hjust = 0, vjust = 1,
                fontfamily = font_legend,
-               color = "#002D5E")+
+               color = high_col)+
     draw_label(orange_label, 
                x = 0.5, y = 0.88, 
                size = 5.5, 
                hjust = 0, vjust = 1,
                fontfamily = font_legend,
-               color = "#A84E0B")+
-    draw_label("Low\nStreamflow",
+               color = low_col)+
+    draw_label(low_lab,
                x = 0.84, y = 0.355, 
                size = 5.5, 
                hjust = 0.5, vjust = 1,
                fontfamily = font_legend,
-               color = "#A84E0B") +
-    draw_label("High\nStreamflow",
+               color = low_col) +
+    draw_label(high_lab,
                x = 0.84, y = 0.76, 
                size = 5.5, 
                hjust = 0.5, vjust = 1,
                fontfamily = font_legend,
-               color = "#002D5E") +
-    draw_label("Typical\nStreamflow",
-               x = 0.855, y = 0.5, 
+               color = high_col) +
+    draw_label(typ_lab,
+               x = 0.855, y = typ_lab_ypos, 
                size = 5.5, 
                hjust = 0.5, vjust = 1,
                fontfamily = font_legend,
@@ -101,7 +102,7 @@ cowplot_national_explainer <- function(explainer_label, file_png, national_plot_
               height = 0.035, width = 0.05,
               hjust = 0, vjust = 0.5)+
     draw_plot(normal_range_arrow, # for typical streamflow
-              x = 0.755, y = 0.495,
+              x = 0.755, y = typ_arr_ypos,
               height = 0.035, width = 0.05,
               hjust = 0, vjust = 0.5)+
     draw_plot(low_range_arrow, # for low streamflow
