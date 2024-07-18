@@ -106,21 +106,12 @@ plot_national_area <- function(national_data, date_start, date_end, pal, color_b
                        breaks = rev(c(0, 0.25, 0.5, 0.75, 1)), #
                        labels = c("0%", "25%", "50%", "75%", "100%") #
     ) +
-    #scale_y_continuous(trans = "reverse",
-    #                   breaks = rev(c(0.05,0.5, 0.95)), 
-    #                   labels = c("0%","gages","100%"),
-    #                   sec.axis = dup_axis(
-    #                     labels = c("Dry", "", "Wet")
-    #                   )) +
     theme_flowfacet(base = 12, color_bknd, text_color) +
-    theme(#axis.text.y = element_text(size = axis_text_size,
-          #                           vjust = c(1, 0), 
-          #                           hjust = 1),
-      axis.text.y = element_text(size = axis_text_size, #
-                                 vjust = 0.5, #c(1, 0), #
-                                 hjust = 1), #
-      axis.title.y = element_text(size = axis_title_bottom_size, #
-                                  margin = margin(r = 5)),
+    theme(axis.text.y = element_text(size = axis_text_size, #
+                                     vjust = 0.5, #c(1, 0), #
+                                     hjust = 1), #
+          axis.title.y = element_text(size = axis_title_bottom_size, #
+                                      margin = margin(r = 5)),
           axis.title.x.bottom = element_text(size = axis_title_bottom_size,
                                              vjust = -1,
                                              margin = margin(t = 5)),
