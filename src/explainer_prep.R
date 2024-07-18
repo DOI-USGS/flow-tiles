@@ -7,7 +7,7 @@
 #' @param text_color color used for viz text
 #' @param blue_label label for wet condition interpretation tip
 #' @param orange_label label for dry condition interpretation tip
-cowplot_national_explainer <- function(explainer_label, file_png, 
+cowplot_national_explainer <- function(explainer_label, file_png, national_plot_png,
                                        width, height, font_legend, text_color, blue_label, orange_label){
 
   plot_margin <- 0.025
@@ -46,7 +46,7 @@ cowplot_national_explainer <- function(explainer_label, file_png,
                  curvature = 0, angle = 100, ncp = 10,
                  color = "#002D5E", linewidth = 0.2))
   
-  national_plot_png <- magick::image_read("out/flow_national_ig.png")
+  og_plot_png <- magick::image_read(national_plot_png)
   # compose final plot
   ggdraw(ylim = c(0,1), 
          xlim = c(0,1)) +
@@ -55,7 +55,7 @@ cowplot_national_explainer <- function(explainer_label, file_png,
               x = 0, y = 1,
               height = 1, width = 1,
               hjust = 0, vjust = 1) +
-    draw_image(national_plot_png, 
+    draw_image(og_plot_png, 
                x = 0, y = 0, 
                width = 1, 
                hjust = 0, vjust = 0, 

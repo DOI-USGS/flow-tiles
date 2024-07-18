@@ -247,7 +247,8 @@ list(
   # cowplot the national plot png for instagram with explainer text
   tar_target(
     explainer_flow_national_ig_png,
-    cowplot_national_explainer(explainer_label = "HOT TIP: Keep proportions in mind!", 
+    cowplot_national_explainer(national_plot_png = "out/flow_national_ig.png",
+                               explainer_label = "HOT TIP: Keep proportions in mind!", 
                                blue_label = "More blue = wetter conditions",
                                orange_label = "More yellow/orange = drier conditions",
                                file_png = "out/explainer_flow_national_ig.png", 
