@@ -1,15 +1,12 @@
 #' @description Cowplot national data image with explainer annotations
-#' @param plot_nat National data plot
-#' @param date_start first day of focal month
-#' @param flow_label legend explainer text
-#' @param source_label data source text
-#' @param legend restyled legend
 #' @param explainer_label top annotation for how to read the plot
 #' @param file_png file path for final png
 #' @param width width of final png
 #' @param height height of final png
 #' @param font_legend font used for legend text
 #' @param text_color color used for viz text
+#' @param blue_label label for wet condition interpretation tip
+#' @param orange_label label for dry condition interpretation tip
 cowplot_national_explainer <- function(explainer_label, file_png, 
                                        width, height, font_legend, text_color, blue_label, orange_label){
 
@@ -58,7 +55,11 @@ cowplot_national_explainer <- function(explainer_label, file_png,
               x = 0, y = 1,
               height = 1, width = 1,
               hjust = 0, vjust = 1) +
-    draw_image(national_plot_png, x = 0, y = 0, width = 1, hjust = 0, vjust = 0, halign = 0, valign = 0)+
+    draw_image(national_plot_png, 
+               x = 0, y = 0, 
+               width = 1, 
+               hjust = 0, vjust = 0, 
+               halign = 0, valign = 0)+
     draw_label(explainer_label, 
                x = 0.5, y = 0.96, 
                size = 5.5, 
@@ -96,26 +97,17 @@ cowplot_national_explainer <- function(explainer_label, file_png,
                fontfamily = font_legend,
                color = text_color) +
     draw_plot(high_range_arrow, # for high streamflow
-              x = 0.755, 
-              y = 0.755,
-              height = 0.035, 
-              width = 0.05,
-              hjust = 0,
-              vjust = 0.5)+
+              x = 0.755, y = 0.755,
+              height = 0.035, width = 0.05,
+              hjust = 0, vjust = 0.5)+
     draw_plot(normal_range_arrow, # for typical streamflow
-              x = 0.755, 
-              y = 0.495,
-              height = 0.035, 
-              width = 0.05,
-              hjust = 0,
-              vjust = 0.5)+
+              x = 0.755, y = 0.495,
+              height = 0.035, width = 0.05,
+              hjust = 0, vjust = 0.5)+
     draw_plot(low_range_arrow, # for low streamflow
-              x = 0.755, 
-              y = 0.35,
-              height = 0.035, 
-              width = 0.055,
-              hjust = 0,
-              vjust = 0.5)
+              x = 0.755, y = 0.35,
+              height = 0.035, width = 0.055,
+              hjust = 0, vjust = 0.5)
   
   # Save and convert file
   ggsave(file_png, width = width, height = height, dpi = 300, units = c("px"))
@@ -174,33 +166,25 @@ intro_image <- function(plot_nat_clean, date_start, font_legend, width, height, 
               hjust = 0, vjust = 1) +
     # national-level plot
     draw_plot(plot_nat_clean,
-              x = -0.055,
-              y = -0.09,
-              height = 1.18,
-              width = 1.18)+
+              x = -0.055, y = -0.09,
+              height = 1.18, width = 1.18)+
     # draw title
     draw_label(sprintf('%s %s', plot_month, plot_year),
                x = plot_margin*2, y = 1-plot_margin*1.2,
                size = 16,
-               hjust = 0,
-               vjust = 1,
+               hjust = 0, vjust = 1,
                fontfamily = font_legend,
                color = "#222222",
                lineheight = 1)  +
     # stylized streamflow title
     draw_image(title_flow_dark ,
-               x = plot_margin*2,
-               y = 1-(1.5*plot_margin),
-               height = 0.16,
-               width = 0.74,
-               hjust = 0,
-               vjust = 1) +
+               x = plot_margin*2, y = 1-(1.5*plot_margin),
+               height = 0.16, width = 0.74,
+               hjust = 0, vjust = 1) +
     draw_label(sprintf("How did %s's\nstreamflow\ncompare to the\npast?", plot_month),
-               x = 0.05,
-               y = 0.5,
+               x = 0.05, y = 0.5,
                size = 26,
-               hjust = 0,
-               vjust = 0.5,
+               hjust = 0, vjust = 0.5,
                fontfamily = font_legend,
                color = "#222222")
   
