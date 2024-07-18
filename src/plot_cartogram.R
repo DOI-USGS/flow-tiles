@@ -1,10 +1,10 @@
 #' @description Create tile grid for state map
 make_carto_grid <- function(){
   us_state_grid1 %>% 
+    as_tibble() %>%
     add_row(row = 7, col = 11, code = "PR", name = "Puerto Rico") %>% # add PR
     filter(code != "DC") # remove DC (only has 3 gages)
 }
-
 #' @description Pull state fips code to bind to state grid
 get_state_fips <- function(){
   maps::state.fips %>% 
@@ -192,8 +192,8 @@ combine_plots <- function(file_svg, plot_left, plot_right, date_start, width, he
       barwidth = 22,
       barheight = 1,
       background = element_rect(fill = NA),
-      show.limits = TRUE#,
-      #even.steps = FALSE
+      show.limits = TRUE,
+      even.steps = TRUE
     )) +
       theme(legend.background = element_rect(fill = NA),
             text = element_text(family = font_legend, color = text_color))
@@ -318,8 +318,8 @@ restyle_legend <- function(plot_nat, text_color, font_legend, barwidth, barheigh
       barwidth = barwidth,
       barheight = barheight,
       background = element_rect(fill = NA),
-      show.limits = TRUE#,
-      #even.steps = FALSE
+      show.limits = TRUE,
+      even.steps = TRUE
     )) +
     theme(legend.background = element_rect(fill = NA),
           text = element_text(family = font_legend, color = text_color, size = text_size))
