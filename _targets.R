@@ -6,9 +6,11 @@ tar_option_set(packages = c('tidyverse', 'lubridate', 'geofacet', 'cowplot','ggf
 
 source("src/prep_data.R")
 source("src/plot_cartogram.R")
+source("src/explainer_prep.R")
 
 # wet to dry color scale
-pal_wetdry <- c("#002D5E", "#0C7182", "#6CB7B0", "#A7D2D8", "#E0D796", "#AF9423", "#A84E0B")
+pal_wetdry <- c("#002D5E", "#0C7182", "#6CB7B0", "#C0C0C0", "#F0DB85", "#AF9423", "#A84E0B")
+  #c("#002D5E", "#0C7182", "#6CB7B0", "#A7D2D8", "#E0D796", "#AF9423", "#A84E0B")
 percentile_breaks = c(0, 0.05, 0.1, 0.25, 0.75, 0.9, 0.95, 1)
 percentile_labels <- c("Driest", "Drier", "Dry", "Normal","Wet","Wetter", "Wettest")
 color_bknd <- "#F4F4F4"
@@ -22,7 +24,8 @@ showtext_opts(dpi = 300, regular.wt = 200, bold.wt = 700)
 showtext_auto(enable = TRUE)
 
 # draw label text
-flow_label <- "Flow percentile at USGS streamgages relative\nto the historic record."
+flow_label <- "Streamflow percentile at USGS streamgages\nrelative to the historic record."
+#"Flow percentile at USGS streamgages relative\nto the historic record."
 source_label <- "Data: USGS Water Data for the Nation"
 
 # to produce the flow cartogram, run tar_make() in the console
@@ -108,7 +111,7 @@ list(
                   width = 16, height = 9, color_bknd, text_color, font_legend,
                   source_label),
     format = "file"
-  ),
+  ), 
   # Remove facet clipping and save as png
   tar_target(
     flow_cartogram_png,
@@ -162,7 +165,7 @@ list(
                 font_legend),
     format = "file"
   ),
-
+  
   # Flow timeseries for states - Instagram
   tar_target(
     flow_cartogram_instagram_svg,
@@ -237,5 +240,37 @@ list(
     pattern = map(plot_cart_state_ig_story_list, state_abbr_filter),
     format = 'file',
     iteration = 'list'
+  ),
+  
+  #### explainer images and updated state ####
+  
+  # cowplot the national plot png for instagram with explainer text
+  tar_target(
+    explainer_flow_national_ig_png,
+    cowplot_national_explainer(national_plot_png = "out/flow_national_ig.png",
+                               explainer_label = "HOT TIP: Keep proportions in mind!", 
+                               blue_label = "More blue = wetter conditions",
+                               orange_label = "More yellow/orange = drier conditions",
+                               file_png = "out/explainer_flow_national_ig.png", 
+                               width = 1080, height = 1080, font_legend, text_color,
+                               low_col = "#A84E0B", high_col = "#002D5E", 
+                               low_lab = "Low\nStreamflow", 
+                               high_lab = "High\nStreamflow", 
+                               typ_lab = "Typical\nStreamflow",
+                               typ_lab_ypos = 0.5, typ_arr_ypos = 0.495),
+    format = "file"
+  ),
+  
+  # create national plot with a lower alpha value to serve as intro question background
+  tar_target(
+    explainer_intro_background,
+    intro_background(national_data = flow_national, percentile_bin, pal = pal_wetdry) 
+  ),
+  
+  # cowplot the intro question instagram png
+  tar_target(
+    intro_question_ig_png,
+    intro_image(plot_nat_clean = explainer_intro_background, date_start, 
+                font_legend, width = 1080, height = 1080, file_png = "out/intro_question_ig.png")
   )
 )
