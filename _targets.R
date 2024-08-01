@@ -33,7 +33,7 @@ list(
   # Read in data from gage-flow-conditions pipeline output
   tar_target(
     dv,
-    read_csv("https://labs.waterdata.usgs.gov/visualizations/data/flow_conditions_202406.csv", col_types = "cTnnnn")
+    read_csv("https://labs.waterdata.usgs.gov/visualizations/data/flow_conditions_202407.csv", col_types = "cTnnnn")
   ),
   tar_target(
     date_start,
@@ -257,7 +257,7 @@ list(
                                low_lab = "Low\nStreamflow", 
                                high_lab = "High\nStreamflow", 
                                typ_lab = "Typical\nStreamflow",
-                               typ_lab_ypos = 0.5, typ_arr_ypos = 0.495),
+                               typ_lab_ypos = 0.55, typ_arr_ypos = 0.545),
     format = "file"
   ),
   
