@@ -184,7 +184,7 @@ intro_image <- function(plot_nat_clean, date_start, font_legend, width, height, 
                hjust = 0, vjust = 1) +
     draw_label(sprintf("How did %s's\nstreamflow\ncompare to the\npast?", plot_month),
                x = 0.05, y = 0.5,
-               size = 26,
+               size = 24,
                hjust = 0, vjust = 0.5,
                fontfamily = font_legend,
                color = "#222222")
