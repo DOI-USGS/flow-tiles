@@ -257,7 +257,7 @@ list(
                                low_lab = "Low\nStreamflow", 
                                high_lab = "High\nStreamflow", 
                                typ_lab = "Typical\nStreamflow",
-                               typ_lab_ypos = 0.55, typ_arr_ypos = 0.545),
+                               typ_lab_ypos = 0.62, typ_arr_ypos = 0.615),
     format = "file"
   ),
   
