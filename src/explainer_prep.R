@@ -160,7 +160,8 @@ intro_background <- function(national_data, percentile_bin, pal){
 #' @param width width of final png
 #' @param height height of final png
 #' @param file_png file path for final png
-intro_image <- function(plot_nat_clean, date_start, font_legend, width, height, file_png){
+#' @param text_size size of text 
+intro_image <- function(plot_nat_clean, date_start, font_legend, width, height, file_png, text_size){
   
   plot_month <- lubridate::month(date_start, label = TRUE, abbr = FALSE)
   plot_margin <- 0.025
@@ -185,10 +186,11 @@ intro_image <- function(plot_nat_clean, date_start, font_legend, width, height, 
               height = 1.18, width = 1.18) +
     draw_label(sprintf("A look at %s's\nstreamflow across\nthe U.S.", plot_month),
                x = 0.05, y = 0.5,
-               size = 22,
+               size = text_size,
                hjust = 0, vjust = 0.5,
                fontfamily = font_legend,
-               color = "#222222")
+               color = "#222222",
+               lineheight = 1.2)
   
   ggsave(file_png, width = width, height = height, dpi = 300, units = c("px"))
   

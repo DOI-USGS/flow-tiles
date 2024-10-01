@@ -33,7 +33,7 @@ list(
   # Read in data from gage-flow-conditions pipeline output
   tar_target(
     dv,
-    read_csv("https://labs.waterdata.usgs.gov/visualizations/data/flow_conditions_202408.csv", col_types = "cTnnnn")
+    read_csv("https://labs.waterdata.usgs.gov/visualizations/data/flow_conditions_202409.csv", col_types = "cTnnnn")
   ),
   tar_target(
     date_start,
@@ -270,6 +270,7 @@ list(
   tar_target(
     intro_question_ig_png,
     intro_image(plot_nat_clean = explainer_intro_background, date_start, 
-                font_legend, width = 1080, height = 1080, file_png = "out/intro_question_ig.png")
+                font_legend, width = 1080, height = 1080, text_size = 19,
+                file_png = "out/intro_question_ig.png")
   )
 )
