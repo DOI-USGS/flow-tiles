@@ -160,7 +160,7 @@ intro_background <- function(national_data, percentile_bin, pal){
 #' @param width width of final png
 #' @param height height of final png
 #' @param file_png file path for final png
-#' @param text_size size of text 
+#' @param text_size size of text
 intro_image <- function(plot_nat_clean, date_start, font_legend, width, height, file_png, text_size){
   
   plot_month <- lubridate::month(date_start, label = TRUE, abbr = FALSE)
@@ -189,8 +189,7 @@ intro_image <- function(plot_nat_clean, date_start, font_legend, width, height, 
                size = text_size,
                hjust = 0, vjust = 0.5,
                fontfamily = font_legend,
-               color = "#222222",
-               lineheight = 1.2)
+               color = "#222222")
   
   ggsave(file_png, width = width, height = height, dpi = 300, units = c("px"))
   
