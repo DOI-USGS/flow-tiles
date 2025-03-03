@@ -182,7 +182,7 @@ intro_image <- function(plot_nat_clean, date_start, font_legend, width, height, 
               hjust = 0, vjust = 1) +
     # national-level plot
     draw_plot(plot_nat_clean,
-              x = -0.055, y = -0.09,
+              x = -0.075, y = -0.09,
               height = 1.18, width = 1.18) +
     draw_label(sprintf("A look at %s's\nstreamflow across\nthe U.S.", plot_month),
                x = 0.05, y = 0.5,
