@@ -97,7 +97,8 @@ plot_national_area <- function(national_data, date_start, date_end, pal, color_b
     ggplot(aes(date, prop)) +
     geom_area(aes(fill = percentile_bin)) +
     theme_classic() +
-    labs(x = lubridate::month(date_end - 30, label = TRUE, abbr = FALSE), #
+    # For feb 2025 do "-27" instead of "-30" for x axis label
+    labs(x = lubridate::month(date_end - 27, label = TRUE, abbr = FALSE), #
          y="% of Streamgages") +
     #labs(x = lubridate::month(date_end - 30, label = TRUE, abbr = FALSE),
     #     y="") +
@@ -240,7 +241,7 @@ combine_plots <- function(file_svg, plot_left, plot_right, date_start, width, he
     # percentile info
     draw_label("Flow percentile at USGS streamgages\nrelative to the historic record.", 
                x = plot_margin*2,
-               y = 0.25,
+               y = 0.24,
                hjust = 0,
                vjust = 1,
                fontfamily = font_legend,

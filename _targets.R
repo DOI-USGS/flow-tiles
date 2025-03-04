@@ -33,7 +33,7 @@ list(
   # Read in data from gage-flow-conditions pipeline output
   tar_target(
     dv,
-    read_csv("https://labs.waterdata.usgs.gov/visualizations/data/flow_conditions_202501.csv", col_types = "cTnnnn")
+    read_csv("https://labs.waterdata.usgs.gov/visualizations/data/flow_conditions_202502.csv", col_types = "cTnnnn")
   ),
   tar_target(
     date_start,
@@ -41,7 +41,8 @@ list(
   ),
   tar_target(
     date_end,
-    as.Date(max(dv$dateTime))+1 # using first date of next month for label positioning
+    as.Date(max(dv$dateTime)) # using first date of next month for label positioning
+    # For feb 2025 drop "+1"  
   ),
   # Bin percentile data 
   tar_target(
