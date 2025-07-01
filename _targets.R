@@ -249,8 +249,6 @@ list(
   tar_target(
     explainer_flow_national_ig_png,
     cowplot_national_explainer(national_plot_png = "out/flow_national_ig.png",
-                               blue_label = "Wetter\nconditions",
-                               orange_label = "Drier\nconditions",
                                file_png = "out/explainer_flow_national_ig.png", 
                                width = 1080, height = 1080, font_legend, text_color,
                                low_col = "#A84E0B", high_col = "#002D5E", 
