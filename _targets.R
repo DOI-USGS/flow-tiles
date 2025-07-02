@@ -33,7 +33,7 @@ list(
   # Read in data from gage-flow-conditions pipeline output
   tar_target(
     dv,
-    read_csv("https://labs.waterdata.usgs.gov/visualizations/data/flow_conditions_202505.csv", col_types = "cTnnnn")
+    read_csv("https://labs.waterdata.usgs.gov/visualizations/data/flow_conditions_202506.csv", col_types = "cTnnnn")
   ),
   tar_target(
     date_start,
@@ -249,8 +249,6 @@ list(
   tar_target(
     explainer_flow_national_ig_png,
     cowplot_national_explainer(national_plot_png = "out/flow_national_ig.png",
-                               blue_label = "Wetter\nconditions",
-                               orange_label = "Drier\nconditions",
                                file_png = "out/explainer_flow_national_ig.png", 
                                width = 1080, height = 1080, font_legend, text_color,
                                low_col = "#A84E0B", high_col = "#002D5E", 

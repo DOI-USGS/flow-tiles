@@ -4,10 +4,9 @@
 #' @param height height of final png
 #' @param font_legend font used for legend text
 #' @param text_color color used for viz text
-#' @param blue_label label for wet condition interpretation tip
-#' @param orange_label label for dry condition interpretation tip
+
 cowplot_national_explainer <- function(file_png, national_plot_png,
-                                       width, height, font_legend, text_color, blue_label, orange_label,
+                                       width, height, font_legend, text_color, 
                                        low_col, high_col, low_lab, high_lab, typ_lab, typ_lab_ypos, typ_arr_ypos){
 # typ_lab_ypos = 0.5, typ_arr_ypos = 0.495
   plot_margin <- 0.025
@@ -78,26 +77,6 @@ cowplot_national_explainer <- function(file_png, national_plot_png,
                width = 1, 
                hjust = 0, vjust = 0, 
                halign = 0, valign = 0) +
-    draw_label(blue_label, 
-               x = 0.9, y = 0.26, 
-               size = 5.5, 
-               hjust = 0.5, vjust = 1,
-               fontfamily = font_legend,
-               color = high_col) +
-    draw_plot(wet_arrow, # for wet conditions arrow
-              x = 0.85, y = 0.17,
-              height = 0.05, width = 0.06,
-              hjust = 0, vjust = 0.5) +
-    draw_label(orange_label, 
-               x = 0.09, y = 0.26, 
-               size = 5.5, 
-               hjust = 0.5, vjust = 1,
-               fontfamily = font_legend,
-               color = low_col) +
-    draw_plot(dry_arrow, # for dry conditions arrow
-              x = 0.095, y = 0.17,
-              height = 0.05, width = 0.06,
-              hjust = 0, vjust = 0.5) +
     draw_label(low_lab,
                x = 0.86, y = 0.355, 
                size = 5.5, 
