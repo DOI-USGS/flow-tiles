@@ -144,6 +144,14 @@ list(
                    barheight = 0.6,
                    text_size = 6.5)
   ),
+  # Restyling legend for Instagram check dimensions
+  tar_target(
+    restyle_legend_ig_check,
+    restyle_legend(plot_nat, text_color, font_legend,
+                   barwidth = 42,
+                   barheight = 2.1,
+                   text_size = 22.75)
+  ),
   
   # Restyling legend for Instagram story dimensions
   tar_target(
@@ -157,7 +165,9 @@ list(
   # Flow timeseries nationally - Instagram 
   tar_target(
     flow_national_instagram_png,
-    national_ig(file_png = "out/flow_national_ig.png",
+    national_ig(check_ig_safezone = TRUE,
+                file_png = "out/flow_national_ig.png",
+                file_ig_grid = "out/flow_national_ig_grid.png",
                 plot_nat_ig,
                 date_start,
                 width = 1080, height = 1080, color_bknd,
@@ -248,14 +258,20 @@ list(
   # cowplot the national plot png for instagram with explainer text
   tar_target(
     explainer_flow_national_ig_png,
-    cowplot_national_explainer(national_plot_png = "out/flow_national_ig.png",
-                               file_png = "out/explainer_flow_national_ig.png", 
-                               width = 1080, height = 1080, font_legend, text_color,
+    cowplot_national_explainer(check_ig_safezone = FALSE,
+                               # Note: `flow_national_instagram_png` need to be
+                               # run with check_ig_safezone = TRUE for png below
+                               national_plot_png = "out/flow_national_ig_grid.png",
+                               file_png = "out/explainer_flow_national_ig.png",
+                               ig_grid_lines = "in/square-layout-guide-for-IGgrid.png",
+                               width = 5000, height = 5000, font_legend, text_color,
                                low_col = "#A84E0B", high_col = "#002D5E", 
                                low_lab = "Low\nStreamflow", 
                                high_lab = "High\nStreamflow", 
                                typ_lab = "Typical\nStreamflow",
-                               typ_lab_ypos = 0.64, typ_arr_ypos =  0.635),
+                               typ_lab_ypos = 0.54, typ_arr_ypos =  0.565,
+                               date_start, flow_label, source_label, 
+                               restyle_legend = restyle_legend_ig_check),
     format = "file"
   ),
   

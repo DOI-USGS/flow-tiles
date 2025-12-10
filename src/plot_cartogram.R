@@ -333,13 +333,14 @@ restyle_legend <- function(plot_nat, text_color, font_legend, barwidth, barheigh
 #' @param source_label Source label placed in bottom right of plot
 #' @param restyle_legend re-stylizing legend national flow timeseries plot
 #' @param font_legend font styling 
+#' @param check_ig_safezone T/F statement to tweak design for instagram grid format
 national_ig <- function(file_png, plot_nat_ig, date_start, width, height, color_bknd,
-                        text_color, flow_label, source_label, restyle_legend, font_legend){
+                        text_color, flow_label, source_label, restyle_legend, 
+                        font_legend, check_ig_safezone, file_ig_grid){
   
   plot_month <- lubridate::month(date_start, label = TRUE, abbr = FALSE)
   plot_year <- lubridate::year(date_start)
 
-    
   # usgs logo
   usgs_logo <- magick::image_read('in/usgs_logo.png') %>%
     magick::image_colorize(100, text_color) |> magick::image_scale('250x')
@@ -356,9 +357,7 @@ national_ig <- function(file_png, plot_nat_ig, date_start, width, height, color_
     gp = grid::gpar(fill = color_bknd, alpha = 1, col = color_bknd)
   )
   
-  # # Extract from plot
-  # plot_legend <- get_legend(restyle_legend)
-  # 
+  if (check_ig_safezone == FALSE) {
   # compose final plot
   ggdraw(ylim = c(0,1), 
          xlim = c(0,1)) +
@@ -421,7 +420,29 @@ national_ig <- function(file_png, plot_nat_ig, date_start, width, height, color_
   # Save and convert file
   ggsave(file_png, width = width, height = height, dpi = 300, units = c("px"))
   return(file_png)
+  }
   
+  if (check_ig_safezone == TRUE) {
+    # compose final plot
+    ggdraw(ylim = c(0,1), 
+           xlim = c(0,1)) +
+      # a white background
+      draw_grob(canvas,
+                x = 0, y = 1,
+                height = 0.37, width = 0.37,
+                hjust = 0, vjust = 1) +
+      # national-level plot
+      draw_plot(plot_nat_ig+ labs(x = "Day of month") + theme(legend.position = 'none',
+                                                              text = element_text(family = font_legend, color = text_color)),
+                x = (1-plot_margin)*0.08,
+                y = 0.27,
+                height = 0.54 ,
+                width = (1-plot_margin)*0.8) 
+    
+    # Save and convert file
+    ggsave(file_ig_grid, width = width, height = height, dpi = 300, units = c("px"))
+    return(file_ig_grid)
+  }
 }
 
 # flow timeseries for states - instagram versioning (slide 2)
