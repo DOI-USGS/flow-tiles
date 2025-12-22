@@ -133,24 +133,24 @@ list(
   tar_target(
     plot_nat_ig,
     plot_national_area(national_data = flow_national, pal = pal_wetdry, date_start, date_end, color_bknd,
-                       axis_title_size = 14, axis_text_size = 6, axis_title_bottom_size = 10, axis_title_top_size = 12)
+                       axis_title_size = 40, axis_text_size = 24, axis_title_bottom_size = 38, axis_title_top_size = 46)
   ),
   
   # Restyling legend for Instagram dimensions
   tar_target(
-    restyle_legend_ig,
-    restyle_legend(plot_nat, text_color, font_legend,
-                   barwidth = 12,
-                   barheight = 0.6,
-                   text_size = 6.5)
-  ),
-  # Restyling legend for Instagram check dimensions
-  tar_target(
-    restyle_legend_ig_check,
+    restyle_legend_ig_national,
     restyle_legend(plot_nat, text_color, font_legend,
                    barwidth = 42,
                    barheight = 2.1,
                    text_size = 22.75)
+  ),
+  
+  tar_target(
+    restyle_legend_ig_cartogram,
+      restyle_legend(plot_nat, text_color, font_legend,
+                     barwidth = 12,
+                     barheight = 0.6,
+                     text_size = 6.5)
   ),
   
   # Restyling legend for Instagram story dimensions
@@ -161,19 +161,21 @@ list(
                    barheight = 2.4,
                    text_size = 25)
   ),
-  
+
   # Flow timeseries nationally - Instagram 
   tar_target(
     flow_national_instagram_png,
-    national_ig(check_ig_safezone = TRUE,
-                file_png = "out/flow_national_ig.png",
-                file_ig_grid = "out/flow_national_ig_grid.png",
+    national_ig(file_png = "out/flow_national_ig.png",
                 plot_nat_ig,
                 date_start,
-                width = 1080, height = 1080, color_bknd,
+                width = 5000, height = 5000, color_bknd,
                 text_color, flow_label, source_label, 
-                restyle_legend = restyle_legend_ig, 
-                font_legend),
+                restyle_legend = restyle_legend_ig_national, 
+                font_legend, low_col = "#A84E0B", high_col = "#002D5E", 
+                low_lab = "Low\nStreamflow", 
+                high_lab = "High\nStreamflow", 
+                typ_lab = "Typical\nStreamflow",
+                typ_lab_ypos = 0.562, typ_arr_ypos =  0.585),
     format = "file"
   ),
   
@@ -186,7 +188,7 @@ list(
                 date_start,
                 width = 1080, height = 1080, color_bknd,
                 text_color, flow_label, source_label,
-                restyle_legend = restyle_legend_ig,
+                restyle_legend = restyle_legend_ig_cartogram,
                 font_legend),
     format = "file"
   ),
@@ -255,23 +257,18 @@ list(
   
   #### explainer images and updated state ####
   
-  # cowplot the national plot png for instagram with explainer text
+  # cowplot the national plot png for instagram with source label + logo and
+  # check if contents fit in 2025 Instagram safezone for landing image
   tar_target(
     explainer_flow_national_ig_png,
-    cowplot_national_explainer(check_ig_safezone = FALSE,
-                               # Note: `flow_national_instagram_png` need to be
-                               # run with check_ig_safezone = TRUE for png below
-                               national_plot_png = "out/flow_national_ig_grid.png",
-                               file_png = "out/explainer_flow_national_ig.png",
+    cowplot_national_explainer(check_ig_safezone = TRUE,
+                               national_plot_png = flow_national_instagram_png,
+                               file_png_list = list(
+                                 check_ig_safezone = "out/explainer_flow_national_ig_grid.png",
+                                 dont_check_ig_safezone = "out/explainer_flow_national_ig.png"),
                                ig_grid_lines = "in/square-layout-guide-for-IGgrid.png",
-                               width = 5000, height = 5000, font_legend, text_color,
-                               low_col = "#A84E0B", high_col = "#002D5E", 
-                               low_lab = "Low\nStreamflow", 
-                               high_lab = "High\nStreamflow", 
-                               typ_lab = "Typical\nStreamflow",
-                               typ_lab_ypos = 0.54, typ_arr_ypos =  0.565,
-                               date_start, flow_label, source_label, 
-                               restyle_legend = restyle_legend_ig_check),
+                               width = 5000, height = 5000,  font_legend = font_legend,
+                               text_color = text_color, source_label = source_label),
     format = "file"
   ),
   

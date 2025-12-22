@@ -112,10 +112,10 @@ plot_national_area <- function(national_data, date_start, date_end, pal, color_b
                                      vjust = 0.5, #c(1, 0), #
                                      hjust = 1), #
           axis.title.y = element_text(size = axis_title_bottom_size, #
-                                      margin = margin(r = 5)),
+                                      margin = margin(r = 20)),
           axis.title.x.bottom = element_text(size = axis_title_bottom_size,
                                              vjust = -1,
-                                             margin = margin(t = 5)),
+                                             margin = margin(t = 10)),
           axis.title.x.top = element_text(size = axis_title_top_size,
                                           vjust = 0,
                                           margin = margin(b = -5)),
@@ -333,18 +333,21 @@ restyle_legend <- function(plot_nat, text_color, font_legend, barwidth, barheigh
 #' @param source_label Source label placed in bottom right of plot
 #' @param restyle_legend re-stylizing legend national flow timeseries plot
 #' @param font_legend font styling 
-#' @param check_ig_safezone T/F statement to tweak design for instagram grid format
+#' @param low_col Hex color for low streamflow label and arrow
+#' @param high_col Hex color for high streamflow label and arrow
+#' @param low_lab Character string for low streamflow label
+#' @param high_lab Character string for high streamflow label
+#' @param typ_lab Character string for typical/normal streamflow label
+#' @param typ_lab_ypos Numeric value for typical label y-position (0-1)
+#' @param typ_arr_ypos Numeric value for typical arrow y-position (0-1)
 national_ig <- function(file_png, plot_nat_ig, date_start, width, height, color_bknd,
                         text_color, flow_label, source_label, restyle_legend, 
-                        font_legend, check_ig_safezone, file_ig_grid){
+                        font_legend, low_col, high_col, low_lab, high_lab, typ_lab, 
+                        typ_lab_ypos, typ_arr_ypos){
   
   plot_month <- lubridate::month(date_start, label = TRUE, abbr = FALSE)
   plot_year <- lubridate::year(date_start)
 
-  # usgs logo
-  usgs_logo <- magick::image_read('in/usgs_logo.png') %>%
-    magick::image_colorize(100, text_color) |> magick::image_scale('250x')
-  
   # streamflow title
   title_flow <- magick::image_read('in/streamflow.png') |> magick::image_scale('800x')
   
@@ -357,7 +360,48 @@ national_ig <- function(file_png, plot_nat_ig, date_start, width, height, color_
     gp = grid::gpar(fill = color_bknd, alpha = 1, col = color_bknd)
   )
   
-  if (check_ig_safezone == FALSE) {
+  # arrows
+  (dry_arrow <- ggplot() +
+      theme_void() +
+      # add arrow using `geom_curve()`
+      geom_curve(aes(x = -13, y = 3,
+                     xend = -11, yend = 2),
+                 arrow = grid::arrow(length = unit(1.25, 'lines')),
+                 curvature = 0.3, angle = 80, ncp = 10,
+                 color = low_col, linewidth = 1.25))
+  
+  (wet_arrow <- ggplot() +
+      theme_void() +
+      geom_curve(aes(x = 13, y = 3,
+                     xend = 11, yend = 2),
+                 arrow = grid::arrow(length = unit(1.25, 'lines')),
+                 curvature = -0.3, angle = 80, ncp = 10,
+                 color = high_col, linewidth = 1.25))
+  
+  (normal_range_arrow <- ggplot() +
+      theme_void()+
+      geom_curve(aes(x = 13, y = 3,
+                     xend = 11, yend = 3),
+                 arrow = grid::arrow(length = unit(1.25, 'lines')),
+                 curvature = 0, angle = 100, ncp = 10,
+                 color = text_color, linewidth = 1.25))
+  
+  (low_range_arrow <- ggplot() +
+      theme_void()+
+      geom_curve(aes(x = 13, y = 3,
+                     xend = 11, yend = 3),
+                 arrow = grid::arrow(length = unit(1.25, 'lines')),
+                 curvature = 0, angle = 100, ncp = 10,
+                 color = low_col, linewidth = 1.25))
+  
+  (high_range_arrow <- ggplot() +
+      theme_void()+
+      geom_curve(aes(x = 13, y = 3,
+                     xend = 11, yend = 3),
+                 arrow = grid::arrow(length = unit(1.25, 'lines')),
+                 curvature = 0, angle = 100, ncp = 10,
+                 color = high_col, linewidth = 1.25))
+  
   # compose final plot
   ggdraw(ylim = c(0,1), 
          xlim = c(0,1)) +
@@ -367,82 +411,101 @@ national_ig <- function(file_png, plot_nat_ig, date_start, width, height, color_
               height = 0.37, width = 0.37,
               hjust = 0, vjust = 1) +
     # national-level plot
-    draw_plot(plot_nat_ig+ labs(x = "Day of month") + theme(legend.position = 'none',
-                                                            text = element_text(family = font_legend, color = text_color)),
-              x = (1-plot_margin)*0.08,
-              y = 0.27,
-              height = 0.54 ,
-              width = (1-plot_margin)*0.8) +
+    draw_plot(plot_nat_ig + labs(x = "Day of month") +
+                theme(legend.position = 'none',
+                      text = element_text(family = font_legend,
+                                          color = text_color)),
+              x = -0.065,
+              y = 0.32,
+              height = 0.44 ,
+              width = (1-plot_margin)*1.08) +
+    # High streamflow label
+    draw_label(high_lab,
+               x = 0.787,
+               y = 0.688,
+               size = 22,
+               hjust = 0.5,
+               vjust = 0,
+               fontfamily = font_legend,
+               color = high_col) +
+    # High streamflow arrow
+    draw_plot(high_range_arrow,
+              x = 0.75,
+              y = 0.712,
+              height = 0.06,
+              width = 0.06,
+              hjust = 1,
+              vjust = 0.5) +
+    # Typical streamflow label
+    draw_label(typ_lab,
+               x = 0.797,
+               y = typ_lab_ypos,
+               size = 22,
+               hjust = 0.5,
+               vjust = 0,
+               fontfamily = font_legend,
+               color = text_color) +
+    # Typical streamflow arrow
+    draw_plot(normal_range_arrow,
+              x = 0.75,
+              y = typ_arr_ypos,
+              height = 0.06,
+              width = 0.06,
+              hjust = 1,
+              vjust = 0.5) +
+    # Low streamflow label
+    draw_label(low_lab,
+               x = 0.787,
+               y = 0.37,
+               size = 22,
+               hjust = 0.5,
+               vjust = 0,
+               fontfamily = font_legend,
+               color = low_col) +
+    # Low streamflow arrow
+    draw_plot(low_range_arrow,
+              x = 0.75,
+              y = 0.395,
+              height = 0.06,
+              width = 0.06,
+              hjust = 1,
+              vjust = 0.5) + 
     # add legend
     draw_plot(restyle_legend,
               x = (1-plot_margin)*0.5,
-              y = 0.07,
+              y = 0.133,
               height = 0.12 ,
               width = 0.02-plot_margin) +
     # draw title
     draw_label(sprintf('%s %s', plot_month, plot_year),
-               x = plot_margin*2, y = 1-plot_margin*1.2,
-               size = 16,
+               x = plot_margin*7.5, y = 1-plot_margin*2.5,
+               size = 72,
                hjust = 0,
                vjust = 1,
                fontfamily = font_legend,
                color = text_color,
                lineheight = 1)  +
     # stylized streamflow title
-    draw_image(title_flow ,
-               x = plot_margin*2,
-               y = 1-(1.5*plot_margin),
-               height = 0.16,
-               width = 0.74,
+    draw_image(title_flow,
+               x = plot_margin*7.6,
+               y = 1-(2.4*plot_margin),
+               height = 0.2,
+               width = 0.76,
                hjust = 0,
                vjust = 1) +
     # percentile info
     draw_label(flow_label,
-               x = (1-plot_margin)*0.18,
-               y = 0.22,
+               x = (1-plot_margin)*0.246,
+               y = 0.27,
                hjust = 0,
                vjust = 1,
                fontfamily = font_legend,
                color = text_color,
-               size = 6) +
-    # add data source
-    draw_label(source_label, 
-               x = 1-plot_margin*2, y = plot_margin, 
-               fontface = "italic", 
-               size = 5, 
-               hjust = 1, vjust = 0,
-               fontfamily = font_legend,
-               color = text_color,
-               lineheight = 1.1) +
-    # add logo
-    draw_image(usgs_logo, x = plot_margin*2, y = plot_margin*1, width = 0.125, hjust = 0, vjust = 0, halign = 0, valign = 0)
+               size = 24) 
   
   # Save and convert file
   ggsave(file_png, width = width, height = height, dpi = 300, units = c("px"))
   return(file_png)
-  }
-  
-  if (check_ig_safezone == TRUE) {
-    # compose final plot
-    ggdraw(ylim = c(0,1), 
-           xlim = c(0,1)) +
-      # a white background
-      draw_grob(canvas,
-                x = 0, y = 1,
-                height = 0.37, width = 0.37,
-                hjust = 0, vjust = 1) +
-      # national-level plot
-      draw_plot(plot_nat_ig+ labs(x = "Day of month") + theme(legend.position = 'none',
-                                                              text = element_text(family = font_legend, color = text_color)),
-                x = (1-plot_margin)*0.08,
-                y = 0.27,
-                height = 0.54 ,
-                width = (1-plot_margin)*0.8) 
-    
-    # Save and convert file
-    ggsave(file_ig_grid, width = width, height = height, dpi = 300, units = c("px"))
-    return(file_ig_grid)
-  }
 }
 
 # flow timeseries for states - instagram versioning (slide 2)
