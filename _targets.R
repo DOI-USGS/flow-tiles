@@ -14,7 +14,6 @@ pal_wetdry <- c("#002D5E", "#0C7182", "#6CB7B0", "#C0C0C0", "#F0DB85", "#AF9423"
 percentile_breaks = c(0, 0.05, 0.1, 0.25, 0.75, 0.9, 0.95, 1)
 percentile_labels <- c("Driest", "Drier", "Dry", "Normal","Wet","Wetter", "Wettest")
 color_bknd <- "#F4F4F4"
-  
 text_color = "#444444"
 
 # Enable font styling   
@@ -258,13 +257,13 @@ list(
   #### explainer images and updated state ####
   
   # cowplot the national plot png for instagram with source label + logo and
-  # check if contents fit in 2025 Instagram safezone for landing image
+  # optionally check if contents fit in 2025 Instagram safezone for landing image
   tar_target(
     explainer_flow_national_ig_png,
-    cowplot_national_explainer(check_ig_safezone = TRUE,
+    `cowplot_final_national_ig`(check_ig_safezone = TRUE,
                                national_plot_png = flow_national_instagram_png,
                                file_png_list = list(
-                                 check_ig_safezone = "out/explainer_flow_national_ig_grid.png",
+                                 check_ig_safezone = "out/explainer_flow_national_ig_check_safezone.png",
                                  dont_check_ig_safezone = "out/explainer_flow_national_ig.png"),
                                ig_grid_lines = "in/square-layout-guide-for-IGgrid.png",
                                width = 5000, height = 5000,  font_legend = font_legend,

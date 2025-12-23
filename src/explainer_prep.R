@@ -8,7 +8,7 @@
 #' @param text_color color used for viz text
 #' @param check_ig_safezone check safe zone guide to check instagram layout
 #' @param source_label Source label placed in bottom right of plot
-cowplot_national_explainer <- function(file_png_list, national_plot_png,
+cowplot_final_national_ig <- function(file_png_list, national_plot_png,
                                        ig_grid_lines, width, height, font_legend,
                                        text_color, check_ig_safezone,
                                        source_label){
@@ -23,10 +23,7 @@ cowplot_national_explainer <- function(file_png_list, national_plot_png,
   usgs_logo <- magick::image_read('in/usgs_logo.png') |> 
     magick::image_colorize(100, text_color) |> magick::image_scale('250x')
   
-  # streamflow title
-  title_flow <- magick::image_read('in/streamflow.png') |> magick::image_scale('800x')
-
-    plot_margin <- 0.025
+  plot_margin <- 0.025
     
   # background
   canvas <- grid::rectGrob(
