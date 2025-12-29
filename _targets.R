@@ -14,7 +14,6 @@ pal_wetdry <- c("#002D5E", "#0C7182", "#6CB7B0", "#C0C0C0", "#F0DB85", "#AF9423"
 percentile_breaks = c(0, 0.05, 0.1, 0.25, 0.75, 0.9, 0.95, 1)
 percentile_labels <- c("Driest", "Drier", "Dry", "Normal","Wet","Wetter", "Wettest")
 color_bknd <- "#F4F4F4"
-  
 text_color = "#444444"
 
 # Enable font styling   
@@ -33,7 +32,7 @@ list(
   # Read in data from gage-flow-conditions pipeline output
   tar_target(
     dv,
-    read_csv("https://labs.waterdata.usgs.gov/visualizations/data/flow_conditions_202510.csv", col_types = "cTnnnn")
+    read_csv("https://labs.waterdata.usgs.gov/visualizations/data/flow_conditions_202511.csv", col_types = "cTnnnn")
   ),
   tar_target(
     date_start,
@@ -133,16 +132,24 @@ list(
   tar_target(
     plot_nat_ig,
     plot_national_area(national_data = flow_national, pal = pal_wetdry, date_start, date_end, color_bknd,
-                       axis_title_size = 14, axis_text_size = 6, axis_title_bottom_size = 10, axis_title_top_size = 12)
+                       axis_title_size = 40, axis_text_size = 24, axis_title_bottom_size = 38, axis_title_top_size = 46)
   ),
   
   # Restyling legend for Instagram dimensions
   tar_target(
-    restyle_legend_ig,
+    restyle_legend_ig_national,
     restyle_legend(plot_nat, text_color, font_legend,
-                   barwidth = 12,
-                   barheight = 0.6,
-                   text_size = 6.5)
+                   barwidth = 42,
+                   barheight = 2.1,
+                   text_size = 22.75)
+  ),
+  
+  tar_target(
+    restyle_legend_ig_cartogram,
+      restyle_legend(plot_nat, text_color, font_legend,
+                     barwidth = 12,
+                     barheight = 0.6,
+                     text_size = 6.5)
   ),
   
   # Restyling legend for Instagram story dimensions
@@ -153,17 +160,21 @@ list(
                    barheight = 2.4,
                    text_size = 25)
   ),
-  
+
   # Flow timeseries nationally - Instagram 
   tar_target(
     flow_national_instagram_png,
     national_ig(file_png = "out/flow_national_ig.png",
                 plot_nat_ig,
                 date_start,
-                width = 1080, height = 1080, color_bknd,
+                width = 5000, height = 5000, color_bknd,
                 text_color, flow_label, source_label, 
-                restyle_legend = restyle_legend_ig, 
-                font_legend),
+                restyle_legend = restyle_legend_ig_national, 
+                font_legend, low_col = "#A84E0B", high_col = "#002D5E", 
+                low_lab = "Low\nStreamflow", 
+                high_lab = "High\nStreamflow", 
+                typ_lab = "Typical\nStreamflow",
+                typ_lab_ypos = 0.562, typ_arr_ypos =  0.585),
     format = "file"
   ),
   
@@ -176,7 +187,7 @@ list(
                 date_start,
                 width = 1080, height = 1080, color_bknd,
                 text_color, flow_label, source_label,
-                restyle_legend = restyle_legend_ig,
+                restyle_legend = restyle_legend_ig_cartogram,
                 font_legend),
     format = "file"
   ),
@@ -245,17 +256,18 @@ list(
   
   #### explainer images and updated state ####
   
-  # cowplot the national plot png for instagram with explainer text
+  # cowplot the national plot png for instagram with source label + logo and
+  # optionally check if contents fit in 2025 Instagram safezone for landing image
   tar_target(
     explainer_flow_national_ig_png,
-    cowplot_national_explainer(national_plot_png = "out/flow_national_ig.png",
-                               file_png = "out/explainer_flow_national_ig.png", 
-                               width = 1080, height = 1080, font_legend, text_color,
-                               low_col = "#A84E0B", high_col = "#002D5E", 
-                               low_lab = "Low\nStreamflow", 
-                               high_lab = "High\nStreamflow", 
-                               typ_lab = "Typical\nStreamflow",
-                               typ_lab_ypos = 0.64, typ_arr_ypos =  0.635),
+    cowplot_final_national_ig(check_ig_safezone = TRUE,
+                               national_plot_png = flow_national_instagram_png,
+                               file_png_list = list(
+                                 check_ig_safezone = "out/explainer_flow_national_ig_check_safezone.png",
+                                 dont_check_ig_safezone = "out/explainer_flow_national_ig.png"),
+                               ig_grid_lines = "in/square-layout-guide-for-IGgrid.png",
+                               width = 5000, height = 5000,  font_legend = font_legend,
+                               text_color = text_color, source_label = source_label),
     format = "file"
   ),
   

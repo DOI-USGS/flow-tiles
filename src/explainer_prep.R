@@ -1,15 +1,30 @@
-#' @description Cowplot national data image with explainer annotations
-#' @param file_png file path for final png
+#' @description Cowplot national data image with source label + logo
+#' and check if content fall within 2025 IG safezone for home landing img.
+#' @param file_png_list file path for final png based off check_ig_safezone parameter 
+#' @param ig_grid_lines file path for instagram square layout for grid in 2025
 #' @param width width of final png
 #' @param height height of final png
 #' @param font_legend font used for legend text
 #' @param text_color color used for viz text
-
-cowplot_national_explainer <- function(file_png, national_plot_png,
-                                       width, height, font_legend, text_color, 
-                                       low_col, high_col, low_lab, high_lab, typ_lab, typ_lab_ypos, typ_arr_ypos){
-# typ_lab_ypos = 0.5, typ_arr_ypos = 0.495
+#' @param check_ig_safezone check safe zone guide to check instagram layout
+#' @param source_label Source label placed in bottom right of plot
+cowplot_final_national_ig <- function(file_png_list, national_plot_png,
+                                       ig_grid_lines, width, height, font_legend,
+                                       text_color, check_ig_safezone,
+                                       source_label){
+  # Selecting output file based off check_ig_safezone
+  file_png <- if (check_ig_safezone) {
+    file_png_list[["check_ig_safezone"]]
+  } else {
+    file_png_list[["dont_check_ig_safezone"]]
+  }
+  
+  # usgs logo
+  usgs_logo <- magick::image_read('in/usgs_logo.png') |> 
+    magick::image_colorize(100, text_color) |> magick::image_scale('250x')
+  
   plot_margin <- 0.025
+    
   # background
   canvas <- grid::rectGrob(
     x = 0, y = 0, 
@@ -17,55 +32,22 @@ cowplot_national_explainer <- function(file_png, national_plot_png,
     gp = grid::gpar(fill = color_bknd, alpha = 1, col = color_bknd)
   )
   
-  #arrows
-  (dry_arrow <- ggplot() + 
-      theme_void() +
-      # add arrow using `geom_curve()`
-      geom_curve(aes(x = -13, y = 3,
-                     xend = -11, yend = 2),
-                 arrow = grid::arrow(length = unit(0.2, 'lines')), 
-                 curvature = 0.3, angle = 80, ncp = 10,
-                 color = low_col, linewidth = 0.2))
-  
-  (wet_arrow <- ggplot() + 
-      theme_void() +
-      # add arrow using `geom_curve()`
-      geom_curve(aes(x = 13, y = 3,
-                     xend = 11, yend = 2),
-                 arrow = grid::arrow(length = unit(0.2, 'lines')), 
-                 curvature = -0.3, angle = 80, ncp = 10,
-                 color = high_col, linewidth = 0.2))
-  
-  (normal_range_arrow <- ggplot() + 
-      theme_void()+
-      # add arrow using `geom_curve()`
-      geom_curve(aes(x = 13, y = 3,
-                     xend = 11, yend = 3),
-                 arrow = grid::arrow(length = unit(0.2, 'lines')), 
-                 curvature = 0, angle = 100, ncp = 10,
-                 color = text_color, linewidth = 0.2))
-  
-  (low_range_arrow <- ggplot() + 
-      theme_void()+
-      # add arrow using `geom_curve()`
-      geom_curve(aes(x = 13, y = 3,
-                     xend = 11, yend = 3),
-                 arrow = grid::arrow(length = unit(0.2, 'lines')), 
-                 curvature = 0, angle = 100, ncp = 10,
-                 color = low_col, linewidth = 0.2))
-  
-  (high_range_arrow <- ggplot() + 
-      theme_void()+
-      # add arrow using `geom_curve()`
-      geom_curve(aes(x = 13, y = 3,
-                     xend = 11, yend = 3),
-                 arrow = grid::arrow(length = unit(0.2, 'lines')), 
-                 curvature = 0, angle = 100, ncp = 10,
-                 color = high_col, linewidth = 0.2))
-  
   og_plot_png <- magick::image_read(national_plot_png)
+  ig_grid_png <- magick::image_read(ig_grid_lines)
+  
+  if (check_ig_safezone) {
+  # convert IG grid to rasterGrob for overlay
+  ig_grid_raster <- grid::rasterGrob(
+    as.raster(ig_grid_png),
+    width = unit(1, "npc"),
+    height = unit(1, "npc"),
+    interpolate = TRUE, 
+    gp = grid::gpar(alpha = 0.4)
+  )
+  }
+  
   # compose final plot
-  ggdraw(ylim = c(0,1), 
+  g <- ggdraw(ylim = c(0,1), 
          xlim = c(0,1)) +
     # a white background
     draw_grob(canvas,
@@ -73,40 +55,27 @@ cowplot_national_explainer <- function(file_png, national_plot_png,
               height = 1, width = 1,
               hjust = 0, vjust = 1) +
     draw_image(og_plot_png, 
-               x = 0.01, y = 0, 
-               width = 1, 
+               x = -0.02, y = -0.01, 
+               width = 1, height = 1.2,
                hjust = 0, vjust = 0, 
-               halign = 0, valign = 0) +
-    draw_label(low_lab,
-               x = 0.86, y = 0.355, 
-               size = 5.5, 
-               hjust = 0.5, vjust = 1,
+               halign = 0, valign = 0) + 
+    # add data source
+    draw_label(source_label, 
+               x = plot_margin + 0.8, y = plot_margin*2, 
+               fontface = "italic", 
+               size = 20, 
+               hjust = 1, vjust = 0,
                fontfamily = font_legend,
-               color = low_col) +
-    draw_label(high_lab,
-               x = 0.86, y = 0.76, 
-               size = 5.5, 
-               hjust = 0.5, vjust = 1,
-               fontfamily = font_legend,
-               color = high_col) +
-    draw_label(typ_lab,
-               x = 0.875, y = typ_lab_ypos, 
-               size = 5.5, 
-               hjust = 0.5, vjust = 1,
-               fontfamily = font_legend,
-               color = text_color) +
-    draw_plot(high_range_arrow, # for high streamflow
-              x = 0.77, y = 0.755,
-              height = 0.035, width = 0.05,
-              hjust = 0, vjust = 0.5) +
-    draw_plot(normal_range_arrow, # for typical streamflow
-              x = 0.77, y = typ_arr_ypos,
-              height = 0.035, width = 0.05,
-              hjust = 0, vjust = 0.5) +
-    draw_plot(low_range_arrow, # for low streamflow
-              x = 0.77, y = 0.35,
-              height = 0.035, width = 0.055,
-              hjust = 0, vjust = 0.5)
+               color = text_color,
+               lineheight = 1.1) +
+    # add logo
+    draw_image(usgs_logo, x = plot_margin + 0.14, y = plot_margin*1.6,
+               width = 0.135, hjust = 0, vjust = 0, halign = 0, valign = 0)
+  
+  # overlay IG grid 
+  if (check_ig_safezone) {
+    g <- g + draw_grob(ig_grid_raster)
+  }
   
   # Save and convert file
   ggsave(file_png, width = width, height = height, dpi = 300, units = c("px"))
