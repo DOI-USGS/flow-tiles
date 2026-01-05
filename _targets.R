@@ -32,7 +32,7 @@ list(
   # Read in data from gage-flow-conditions pipeline output
   tar_target(
     dv,
-    read_csv("https://labs.waterdata.usgs.gov/visualizations/data/flow_conditions_202511.csv", col_types = "cTnnnn")
+    read_csv("https://labs.waterdata.usgs.gov/visualizations/data/flow_conditions_202512.csv", col_types = "cTnnnn")
   ),
   tar_target(
     date_start,
@@ -260,7 +260,7 @@ list(
   # optionally check if contents fit in 2025 Instagram safezone for landing image
   tar_target(
     explainer_flow_national_ig_png,
-    cowplot_final_national_ig(check_ig_safezone = TRUE,
+    cowplot_final_national_ig(check_ig_safezone = FALSE,
                                national_plot_png = flow_national_instagram_png,
                                file_png_list = list(
                                  check_ig_safezone = "out/explainer_flow_national_ig_check_safezone.png",
