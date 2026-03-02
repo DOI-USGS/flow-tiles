@@ -147,9 +147,9 @@ list(
   tar_target(
     restyle_legend_ig_cartogram,
       restyle_legend(plot_nat, text_color, font_legend,
-                     barwidth = 12,
-                     barheight = 0.6,
-                     text_size = 6.5)
+                     barwidth = 14,
+                     barheight = 0.55,
+                     text_size = 7)
   ),
   
   # Restyling legend for Instagram story dimensions
@@ -168,13 +168,10 @@ list(
                 plot_nat_ig,
                 date_start,
                 width = 5000, height = 5000, color_bknd,
-                text_color, flow_label, source_label, 
-                restyle_legend = restyle_legend_ig_national, 
-                font_legend, low_col = "#A84E0B", high_col = "#002D5E", 
-                low_lab = "Low\nStreamflow", 
-                high_lab = "High\nStreamflow", 
-                typ_lab = "Typical\nStreamflow",
-                typ_lab_ypos = 0.562, typ_arr_ypos =  0.585),
+                text_color, source_label, 
+                font_legend, 
+                low_lab = "Dry", 
+                high_lab = "Wet"),
     format = "file"
   ),
   
@@ -186,7 +183,7 @@ list(
                 plot_cart_ig, 
                 date_start,
                 width = 1080, height = 1080, color_bknd,
-                text_color, flow_label, source_label,
+                text_color, flow_label,
                 restyle_legend = restyle_legend_ig_cartogram,
                 font_legend),
     format = "file"
@@ -267,7 +264,7 @@ list(
                                  dont_check_ig_safezone = "out/explainer_flow_national_ig.png"),
                                ig_grid_lines = "in/square-layout-guide-for-IGgrid.png",
                                width = 5000, height = 5000,  font_legend = font_legend,
-                               text_color = text_color, source_label = source_label),
+                               text_color = text_color),
     format = "file"
   ),
   

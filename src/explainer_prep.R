@@ -7,21 +7,16 @@
 #' @param font_legend font used for legend text
 #' @param text_color color used for viz text
 #' @param check_ig_safezone check safe zone guide to check instagram layout
-#' @param source_label Source label placed in bottom right of plot
 cowplot_final_national_ig <- function(file_png_list, national_plot_png,
                                        ig_grid_lines, width, height, font_legend,
-                                       text_color, check_ig_safezone,
-                                       source_label){
+                                       text_color, check_ig_safezone
+                                       ){
   # Selecting output file based off check_ig_safezone
   file_png <- if (check_ig_safezone) {
     file_png_list[["check_ig_safezone"]]
   } else {
     file_png_list[["dont_check_ig_safezone"]]
   }
-  
-  # usgs logo
-  usgs_logo <- magick::image_read('in/usgs_logo.png') |> 
-    magick::image_colorize(100, text_color) |> magick::image_scale('250x')
   
   plot_margin <- 0.025
     
@@ -58,19 +53,7 @@ cowplot_final_national_ig <- function(file_png_list, national_plot_png,
                x = -0.02, y = -0.01, 
                width = 1, height = 1.2,
                hjust = 0, vjust = 0, 
-               halign = 0, valign = 0) + 
-    # add data source
-    draw_label(source_label, 
-               x = plot_margin + 0.8, y = plot_margin*2, 
-               fontface = "italic", 
-               size = 20, 
-               hjust = 1, vjust = 0,
-               fontfamily = font_legend,
-               color = text_color,
-               lineheight = 1.1) +
-    # add logo
-    draw_image(usgs_logo, x = plot_margin + 0.14, y = plot_margin*1.6,
-               width = 0.135, hjust = 0, vjust = 0, halign = 0, valign = 0)
+               halign = 0, valign = 0) 
   
   # overlay IG grid 
   if (check_ig_safezone) {
