@@ -148,7 +148,7 @@ list(
     restyle_legend_ig_cartogram,
       restyle_legend(plot_nat, text_color, font_legend,
                      barwidth = 14,
-                     barheight = 0.55,
+                     barheight = 0.7,
                      text_size = 7)
   ),
   
@@ -167,7 +167,7 @@ list(
     national_ig(file_png = "out/flow_national_ig.png",
                 plot_nat_ig,
                 date_start,
-                width = 5000, height = 5000, color_bknd,
+                width = 1080, height = 1350, color_bknd,
                 text_color, source_label, 
                 font_legend, 
                 low_lab = "Dry", 
@@ -182,7 +182,7 @@ list(
                 plot_nat,
                 plot_cart_ig, 
                 date_start,
-                width = 1080, height = 1080, color_bknd,
+                width = 1080, height = 1350, color_bknd,
                 text_color, flow_label,
                 restyle_legend = restyle_legend_ig_cartogram,
                 font_legend),
@@ -262,8 +262,8 @@ list(
                                file_png_list = list(
                                  check_ig_safezone = "out/explainer_flow_national_ig_check_safezone.png",
                                  dont_check_ig_safezone = "out/explainer_flow_national_ig.png"),
-                               ig_grid_lines = "in/square-layout-guide-for-IGgrid.png",
-                               width = 5000, height = 5000,  font_legend = font_legend,
+                               ig_grid_lines = "in/4-x-5-layout-guide-for-IGgrid.png",
+                               width = 1080, height = 1350,  font_legend = font_legend,
                                text_color = text_color),
     format = "file"
   ),

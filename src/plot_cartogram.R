@@ -375,31 +375,31 @@ national_ig <- function(file_png, plot_nat_ig, date_start, width, height, color_
                 theme(
                   legend.position = "none",
                   axis.text.y = element_text(
-                    margin = margin(r = -20)), 
+                    size = 10, 
+                    margin = margin(r = -2)), 
                   text = element_text(
                     family = font_legend,
-                    color  = text_color,
-                    size = 38),
-                  axis.title.x.bottom = element_text(size = 40,
-                                                     margin = margin(t = -10))),
-              x = -0.09,
-              y = 0.12,
-              height = 0.67,
-              width = (1-plot_margin)*1.23) +
+                    color  = text_color),
+                  axis.title.x.bottom = element_text(size = 12,
+                                                     margin = margin(t = -1))),
+              x = -0.15,
+              y = 0.13,
+              height = 0.64,
+              width = (1-plot_margin)*1.3) +
     # Wet streamflow label
     draw_label(high_lab,
-               x = 0.833,
-               y = 0.74,
-               size = 28,
+               x = 0.889,
+               y = 0.719,
+               size = 10,
                hjust = 0.5,
                vjust = 0,
                fontfamily = font_legend,
                color = text_color) +
     # Dry streamflow label
     draw_label(low_lab,
-               x = 0.833,
-               y = 0.17,
-               size = 28,
+               x = 0.889,
+               y = 0.182,
+               size = 10,
                hjust = 0.5,
                vjust = 0,
                fontfamily = font_legend,
@@ -407,25 +407,25 @@ national_ig <- function(file_png, plot_nat_ig, date_start, width, height, color_
     # 100% streamflow label
     draw_label("100% of streamgages",
                x = 0.305,
-               y = 0.77,
-               size = 28,
+               y = 0.76,
+               size = 10,
                hjust = 0.5,
                vjust = 0,
                fontfamily = font_legend,
                color = text_color) +
     # National conditions label
     draw_label("National Conditions",
-               x = 0.52,
-               y = 0.05,
-               size = 65,
+               x = 0.5,
+               y = 0.04,
+               size = 18,
                hjust = 0.5,
                vjust = 0,
                fontfamily = font_legend,
                color = text_color) +
     # draw title
     draw_label(sprintf('%s %s', plot_month, plot_year),
-               x = plot_margin*7, y = 1-plot_margin*2.5,
-               size = 72,
+               x = plot_margin*3, y = 1-plot_margin*2,
+               size = 20,
                hjust = 0,
                vjust = 1,
                fontfamily = font_legend,
@@ -433,10 +433,10 @@ national_ig <- function(file_png, plot_nat_ig, date_start, width, height, color_
                lineheight = 1)  +
     # stylized streamflow title
     draw_image(title_flow,
-               x = plot_margin*7,
-               y = 1-(2.4*plot_margin),
+               x = plot_margin*3,
+               y = 1-(2*plot_margin),
                height = 0.2,
-               width = 0.76,
+               width = 0.99,
                hjust = 0,
                vjust = 1)
   
@@ -489,27 +489,27 @@ cartogram_ig <- function(file_svg, plot_nat, plot_cart, date_start, width, heigh
     # state tiles
     draw_plot(plot_cart+theme(text = element_text(family = font_legend, color = text_color),
                                strip.text = element_text(size = 6, vjust = -3)),
-              x = 1.09,
-              y = -0.09,
-              height = 1.27,
-              width = 1.2,
+              x = 1.12,
+              y = -0.19,
+              height = 1.4,
+              width = 1.25,
               hjust = 1,
               vjust = 0) + 
     # draw title
     draw_label(sprintf('%s %s', plot_month, plot_year),
-               x = plot_margin*1.4, y = 1-plot_margin*1.2,
-               size = 16,
+               x = plot_margin*3, y = 1-plot_margin*2,
+               size = 20,
                hjust = 0,
                vjust = 1,
                fontfamily = font_legend,
                color = text_color,
                lineheight = 1)  +
     # stylized streamflow title
-    draw_image(title_flow ,
-               x = plot_margin*1.4,
-               y = 1-(1.5*plot_margin),
-               height = 0.16,
-               width = 0.74,
+    draw_image(title_flow,
+               x = plot_margin*3,
+               y = 1-(2*plot_margin),
+               height = 0.2,
+               width = 0.99,
                hjust = 0,
                vjust = 1) +
     # add legend
@@ -520,13 +520,13 @@ cartogram_ig <- function(file_svg, plot_nat, plot_cart, date_start, width, heigh
               width = plot_margin) +
     # percentile info
     draw_label(flow_label,
-               x = (1-plot_margin)*0.18,
+               x = (1-plot_margin)*0.132,
                y = 0.15,
                hjust = 0,
                vjust = 1,
                fontfamily = font_legend,
                color = text_color,
-               size = 7)
+               size = 8)
   
   # Save and convert file
   ggsave(file_svg, width = width, height = height, dpi = 300, units = c("px"))
