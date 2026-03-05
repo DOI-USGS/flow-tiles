@@ -329,21 +329,14 @@ restyle_legend <- function(plot_nat, text_color, font_legend, barwidth, barheigh
 #' @param height Desired height of output plot
 #' @param color_bknd Plot background color
 #' @param text_color Color of text in plot
-#' @param flow_label Flow percentile label placed above legend
 #' @param source_label Source label placed in bottom right of plot
-#' @param restyle_legend re-stylizing legend national flow timeseries plot
 #' @param font_legend font styling 
 #' @param low_col Hex color for low streamflow label and arrow
 #' @param high_col Hex color for high streamflow label and arrow
 #' @param low_lab Character string for low streamflow label
 #' @param high_lab Character string for high streamflow label
-#' @param typ_lab Character string for typical/normal streamflow label
-#' @param typ_lab_ypos Numeric value for typical label y-position (0-1)
-#' @param typ_arr_ypos Numeric value for typical arrow y-position (0-1)
 national_ig <- function(file_png, plot_nat_ig, date_start, width, height, color_bknd,
-                        text_color, flow_label, source_label, restyle_legend, 
-                        font_legend, low_col, high_col, low_lab, high_lab, typ_lab, 
-                        typ_lab_ypos, typ_arr_ypos){
+                        text_color, source_label,  high_col, low_lab, high_lab){
   
   plot_month <- lubridate::month(date_start, label = TRUE, abbr = FALSE)
   plot_year <- lubridate::year(date_start)
@@ -360,48 +353,6 @@ national_ig <- function(file_png, plot_nat_ig, date_start, width, height, color_
     gp = grid::gpar(fill = color_bknd, alpha = 1, col = color_bknd)
   )
   
-  # arrows
-  (dry_arrow <- ggplot() +
-      theme_void() +
-      # add arrow using `geom_curve()`
-      geom_curve(aes(x = -13, y = 3,
-                     xend = -11, yend = 2),
-                 arrow = grid::arrow(length = unit(1.25, 'lines')),
-                 curvature = 0.3, angle = 80, ncp = 10,
-                 color = low_col, linewidth = 1.25))
-  
-  (wet_arrow <- ggplot() +
-      theme_void() +
-      geom_curve(aes(x = 13, y = 3,
-                     xend = 11, yend = 2),
-                 arrow = grid::arrow(length = unit(1.25, 'lines')),
-                 curvature = -0.3, angle = 80, ncp = 10,
-                 color = high_col, linewidth = 1.25))
-  
-  (normal_range_arrow <- ggplot() +
-      theme_void()+
-      geom_curve(aes(x = 13, y = 3,
-                     xend = 11, yend = 3),
-                 arrow = grid::arrow(length = unit(1.25, 'lines')),
-                 curvature = 0, angle = 100, ncp = 10,
-                 color = text_color, linewidth = 1.25))
-  
-  (low_range_arrow <- ggplot() +
-      theme_void()+
-      geom_curve(aes(x = 13, y = 3,
-                     xend = 11, yend = 3),
-                 arrow = grid::arrow(length = unit(1.25, 'lines')),
-                 curvature = 0, angle = 100, ncp = 10,
-                 color = low_col, linewidth = 1.25))
-  
-  (high_range_arrow <- ggplot() +
-      theme_void()+
-      geom_curve(aes(x = 13, y = 3,
-                     xend = 11, yend = 3),
-                 arrow = grid::arrow(length = unit(1.25, 'lines')),
-                 curvature = 0, angle = 100, ncp = 10,
-                 color = high_col, linewidth = 1.25))
-  
   # compose final plot
   ggdraw(ylim = c(0,1), 
          xlim = c(0,1)) +
@@ -411,75 +362,70 @@ national_ig <- function(file_png, plot_nat_ig, date_start, width, height, color_
               height = 0.37, width = 0.37,
               hjust = 0, vjust = 1) +
     # national-level plot
-    draw_plot(plot_nat_ig + labs(x = "Day of month") +
-                theme(legend.position = 'none',
-                      text = element_text(family = font_legend,
-                                          color = text_color)),
-              x = -0.065,
-              y = 0.32,
-              height = 0.44 ,
-              width = (1-plot_margin)*1.08) +
-    # High streamflow label
+    draw_plot(plot_nat_ig +
+                scale_x_continuous(breaks = NULL) +
+                scale_y_continuous(
+                  # this is the only way that would get it to work
+                  # since the previous y scale is used in plot_nat_ig
+                  trans  = "reverse",
+                  breaks = rev(c(0, 0.5, 1)),
+                  labels = c("0%", "50%", " ")
+                ) +
+                labs(x = "Day of month", y = NULL) +
+                theme(
+                  legend.position = "none",
+                  axis.text.y = element_text(
+                    size = 10, 
+                    margin = margin(r = -2)), 
+                  text = element_text(
+                    family = font_legend,
+                    color  = text_color),
+                  axis.title.x.bottom = element_text(size = 12,
+                                                     margin = margin(t = -1))),
+              x = -0.15,
+              y = 0.13,
+              height = 0.64,
+              width = (1-plot_margin)*1.3) +
+    # Wet streamflow label
     draw_label(high_lab,
-               x = 0.787,
-               y = 0.688,
-               size = 22,
-               hjust = 0.5,
-               vjust = 0,
-               fontfamily = font_legend,
-               color = high_col) +
-    # High streamflow arrow
-    draw_plot(high_range_arrow,
-              x = 0.75,
-              y = 0.712,
-              height = 0.06,
-              width = 0.06,
-              hjust = 1,
-              vjust = 0.5) +
-    # Typical streamflow label
-    draw_label(typ_lab,
-               x = 0.797,
-               y = typ_lab_ypos,
-               size = 22,
+               x = 0.889,
+               y = 0.719,
+               size = 10,
                hjust = 0.5,
                vjust = 0,
                fontfamily = font_legend,
                color = text_color) +
-    # Typical streamflow arrow
-    draw_plot(normal_range_arrow,
-              x = 0.75,
-              y = typ_arr_ypos,
-              height = 0.06,
-              width = 0.06,
-              hjust = 1,
-              vjust = 0.5) +
-    # Low streamflow label
+    # Dry streamflow label
     draw_label(low_lab,
-               x = 0.787,
-               y = 0.37,
-               size = 22,
+               x = 0.889,
+               y = 0.182,
+               size = 10,
                hjust = 0.5,
                vjust = 0,
                fontfamily = font_legend,
-               color = low_col) +
-    # Low streamflow arrow
-    draw_plot(low_range_arrow,
-              x = 0.75,
-              y = 0.395,
-              height = 0.06,
-              width = 0.06,
-              hjust = 1,
-              vjust = 0.5) + 
-    # add legend
-    draw_plot(restyle_legend,
-              x = (1-plot_margin)*0.5,
-              y = 0.133,
-              height = 0.12 ,
-              width = 0.02-plot_margin) +
+               color = text_color) +
+    # 100% streamflow label
+    draw_label("100% of streamgages",
+               x = 0.305,
+               y = 0.76,
+               size = 10,
+               hjust = 0.5,
+               vjust = 0,
+               fontfamily = font_legend,
+               color = text_color) +
+    # National conditions label
+    draw_label("National Conditions",
+               x = 0.5,
+               y = 0.04,
+               size = 18,
+               hjust = 0.5,
+               vjust = 0,
+               fontfamily = font_legend,
+               color = text_color) +
     # draw title
     draw_label(sprintf('%s %s', plot_month, plot_year),
-               x = plot_margin*7.5, y = 1-plot_margin*2.5,
-               size = 72,
+               x = plot_margin*3, y = 1-plot_margin*2,
+               size = 20,
                hjust = 0,
                vjust = 1,
                fontfamily = font_legend,
@@ -487,21 +433,12 @@ national_ig <- function(file_png, plot_nat_ig, date_start, width, height, color_
                lineheight = 1)  +
     # stylized streamflow title
     draw_image(title_flow,
-               x = plot_margin*7.6,
-               y = 1-(2.4*plot_margin),
+               x = plot_margin*3,
+               y = 1-(2*plot_margin),
                height = 0.2,
-               width = 0.76,
+               width = 0.99,
                hjust = 0,
-               vjust = 1) +
-    # percentile info
-    draw_label(flow_label,
-               x = (1-plot_margin)*0.246,
-               y = 0.27,
-               hjust = 0,
-               vjust = 1,
-               fontfamily = font_legend,
-               color = text_color,
-               size = 24) 
+               vjust = 1)
   
   # Save and convert file
   ggsave(file_png, width = width, height = height, dpi = 300, units = c("px"))
@@ -519,17 +456,12 @@ national_ig <- function(file_png, plot_nat_ig, date_start, width, height, color_
 #' @param color_bknd Plot background color
 #' @param text_color Color of text in plot
 #' @param flow_label Flow percentile label placed above legend
-#' @param source_label Source label placed in bottom right of plot
 #' @param restyle_legend Restylizing legend national flow timeseries plot
 #' @param font_legend font styling 
 cartogram_ig <- function(file_svg, plot_nat, plot_cart, date_start, width, height, color_bknd,
-                         text_color, flow_label, source_label, restyle_legend, font_legend){
+                         text_color, flow_label, restyle_legend, font_legend){
   plot_month <- lubridate::month(date_start, label = TRUE, abbr = FALSE)
   plot_year <- lubridate::year(date_start)
-  
-  # usgs logo
-  usgs_logo <- magick::image_read('in/usgs_logo.png') %>%
-    magick::image_colorize(100, text_color) |> magick::image_scale('250x')
   
   # streamflow title
   title_flow <- magick::image_read('in/streamflow.png')|> magick::image_scale('800x')
@@ -557,55 +489,44 @@ cartogram_ig <- function(file_svg, plot_nat, plot_cart, date_start, width, heigh
     # state tiles
     draw_plot(plot_cart+theme(text = element_text(family = font_legend, color = text_color),
                                strip.text = element_text(size = 6, vjust = -3)),
-              x = 1.09,
-              y = -0.05,
-              height = 1.27,
-              width = 1.17,
+              x = 1.12,
+              y = -0.19,
+              height = 1.4,
+              width = 1.25,
               hjust = 1,
               vjust = 0) + 
     # draw title
     draw_label(sprintf('%s %s', plot_month, plot_year),
-               x = plot_margin*1.4, y = 1-plot_margin*1.2,
-               size = 16,
+               x = plot_margin*3, y = 1-plot_margin*2,
+               size = 20,
                hjust = 0,
                vjust = 1,
                fontfamily = font_legend,
                color = text_color,
                lineheight = 1)  +
     # stylized streamflow title
-    draw_image(title_flow ,
-               x = plot_margin*1.4,
-               y = 1-(1.5*plot_margin),
-               height = 0.16,
-               width = 0.74,
+    draw_image(title_flow,
+               x = plot_margin*3,
+               y = 1-(2*plot_margin),
+               height = 0.2,
+               width = 0.99,
                hjust = 0,
                vjust = 1) +
     # add legend
     draw_plot(restyle_legend,
               x = (1-plot_margin)*0.5,
-              y = 0.07,
-              height = 0.12 ,
-              width = 0.02-plot_margin) +
+              y = -0.02,
+              height = 0.13 ,
+              width = plot_margin) +
     # percentile info
     draw_label(flow_label,
-               x = (1-plot_margin)*0.18,
-               y = 0.22,
+               x = (1-plot_margin)*0.132,
+               y = 0.15,
                hjust = 0,
                vjust = 1,
                fontfamily = font_legend,
                color = text_color,
-               size = 6) +
-    # add data source
-    draw_label(source_label, 
-               x = 1-plot_margin*2, y = plot_margin, 
-               fontface = "italic", 
-               size = 5, 
-               hjust = 1, vjust = 0,
-               fontfamily = font_legend,
-               color = text_color,
-               lineheight = 1.1) +
-    # add logo
-    draw_image(usgs_logo, x = plot_margin*2, y = plot_margin*1, width = 0.125, hjust = 0, vjust = 0, halign = 0, valign = 0)
+               size = 8)
   
   # Save and convert file
   ggsave(file_svg, width = width, height = height, dpi = 300, units = c("px"))
