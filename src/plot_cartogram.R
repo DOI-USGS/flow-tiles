@@ -376,20 +376,20 @@ national_ig <- function(file_png, plot_nat_ig, date_start, width, height, color_
                   legend.position = "none",
                   axis.text.y = element_text(
                     size = 10, 
-                    margin = margin(r = -2)), 
+                    margin = margin(r = -5)), 
                   text = element_text(
                     family = font_legend,
                     color  = text_color),
                   axis.title.x.bottom = element_text(size = 12,
                                                      margin = margin(t = -1))),
-              x = -0.15,
+              x = 0.095,
               y = 0.13,
               height = 0.64,
-              width = (1-plot_margin)*1.3) +
+              width = (1-plot_margin)*0.81) +
     # Wet streamflow label
     draw_label(high_lab,
-               x = 0.889,
-               y = 0.719,
+               x = 0.895,
+               y = 0.692,
                size = 10,
                hjust = 0.5,
                vjust = 0,
@@ -397,8 +397,8 @@ national_ig <- function(file_png, plot_nat_ig, date_start, width, height, color_
                color = text_color) +
     # Dry streamflow label
     draw_label(low_lab,
-               x = 0.889,
-               y = 0.182,
+               x = 0.895,
+               y = 0.209,
                size = 10,
                hjust = 0.5,
                vjust = 0,
@@ -407,7 +407,7 @@ national_ig <- function(file_png, plot_nat_ig, date_start, width, height, color_
     # 100% streamflow label
     draw_label("100% of streamgages",
                x = 0.305,
-               y = 0.76,
+               y = 0.735,
                size = 10,
                hjust = 0.5,
                vjust = 0,
