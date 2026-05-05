@@ -6,3 +6,4 @@
 _targets/
 *.svg
 out/state_cartograms_*
+.Rapp.history
