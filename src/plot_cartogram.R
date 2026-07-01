@@ -49,8 +49,9 @@ theme_flowfacet <- function(base = 12, color_bknd, text_color){
 #' @param xoffset_val Value assigned to x_offset (offset of the shadow) in  `ggfx::with_shawdow()`
 #' @param yoffset_val Value assigned to y_offset (offset of the shadow) in  `ggfx::with_shawdow()`
 plot_state_cartogram <- function(state_data, fips, pal, usa_grid, color_bknd, sigma_val, xoffset_val, yoffset_val){
-  state_data %>% 
-    left_join(fips) %>% # to bind to cartogram grid
+  state_data %>%
+    left_join(fips) %>%
+    filter(abb %in% usa_grid$code) %>% # drop states/territories not in the grid (e.g. DC)
     ggplot(aes(date, prop)) +
     with_shadow(
       geom_area(aes(fill = percentile_cond)),

@@ -2,7 +2,7 @@ library(targets)
 library(showtext)
 
 options(tidyverse.quiet = TRUE)
-tar_option_set(packages = c('tidyverse', 'lubridate', 'geofacet', 'cowplot','ggfx','showtext', 'xml2', 'dataRetrieval', 'svglite', 'rsvg'))
+tar_option_set(packages = c('tidyverse', 'lubridate', 'geofacet', 'cowplot','ggfx','showtext', 'xml2', 'dataRetrieval', 'svglite', 'rsvg', 'arrow'))
 
 source("src/prep_data.R")
 source("src/plot_cartogram.R")
@@ -22,6 +22,8 @@ font_add_google(font_legend)
 showtext_opts(dpi = 300, regular.wt = 200, bold.wt = 700)
 showtext_auto(enable = TRUE)
 
+base_url <- "https://dfi09q69oy2jm.cloudfront.net/visualizations/current_conditions/streamflow/data/sf_categorizations_"
+
 # draw label text
 flow_label <- "Streamflow percentile at USGS streamgages\nrelative to the historic record."
 #"Flow percentile at USGS streamgages relative\nto the historic record."
@@ -29,35 +31,38 @@ source_label <- "Data: USGS Water Data for the Nation"
 
 # to produce the flow cartogram, run tar_make() in the console
 list(
-  # Read in data from gage-flow-conditions pipeline output
+  # Focal month: change this to switch months
+  tar_target(
+    focal_month,
+    as.Date("2026-06-01")
+  ),
+  # All dates in the focal month
+  tar_target(
+    dates_to_pull,
+    seq(focal_month, by = "day", length.out = days_in_month(focal_month))
+  ),
+  # Download and combine all daily parquets for the month
   tar_target(
     dv,
-    read_csv("https://labs.waterdata.usgs.gov/visualizations/data/flow_conditions_202606.csv", col_types = "cTnnnn")
+    fetch_month_parquets(dates_to_pull, base_url)
   ),
   tar_target(
     date_start,
-    as.Date(min(dv$dateTime))
+    min(dates_to_pull)
   ),
   tar_target(
     date_end,
-    as.Date(max(dv$dateTime)) # using first date of next month for label positioning
-    # For feb 2025 drop "+1"  
+    max(dates_to_pull)
   ),
-  # Bin percentile data 
+  # Map category strings to 7-level flow condition factor
   tar_target(
     flow,
-    add_flow_condition(dv, date_start, date_end, breaks = percentile_breaks, break_labels = percentile_labels)
+    normalize_flow(dv)
   ),
-  # Find list of all active sites
-  tar_target(
-    site_list,
-    unique(flow$site_no)
-  ),
-  # Pull site info (state) 
+  # Build site -> state_cd lookup from parquet data (state info already present)
   tar_target(
     dv_site,
-    dataRetrieval::readNWISsite(siteNumbers = site_list) %>%
-      distinct(site_no, state_cd)
+    build_dv_site(dv)
   ),
   # Count the number of sites in each state
   tar_target(
