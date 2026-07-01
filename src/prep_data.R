@@ -7,7 +7,9 @@ fetch_one_parquet <- function(date, base_url) {
   tmp <- tempfile(fileext = ".parquet")
   tryCatch({
     download.file(url, tmp, quiet = TRUE, mode = "wb")
-    arrow::read_parquet(tmp, col_select = c("monitoring_location_id", "state_name", "category", "runtime"))
+    arrow::read_parquet(tmp, col_select = c("monitoring_location_id", 
+                                            "state_name", "category",
+                                            "runtime"))
   }, error = function(e) {
     warning(paste("Could not fetch parquet for", format(date), ":", e$message))
     tibble()
@@ -35,7 +37,8 @@ normalize_flow <- function(dv_new) {
   )
   cond_levels <- c("Driest", "Drier", "Dry", "Normal", "Wet", "Wetter", "Wettest")
   # guide_colorsteps() requires (lower, upper] format — mirrors what cut() used to produce
-  bin_levels <- c("(0,0.05]", "(0.05,0.1]", "(0.1,0.25]", "(0.25,0.75]", "(0.75,0.9]", "(0.9,0.95]", "(0.95,1]")
+  bin_levels <- c("(0,0.05]", "(0.05,0.1]", "(0.1,0.25]", "(0.25,0.75]",
+                  "(0.75,0.9]", "(0.9,0.95]", "(0.95,1]")
   bin_map <- setNames(bin_levels, cond_levels)
 
   dv_new |>
@@ -44,7 +47,8 @@ normalize_flow <- function(dv_new) {
       site_no = str_remove(monitoring_location_id, "^USGS-"),
       date = as.Date(runtime),
       percentile_cond = factor(category_map[category], levels = cond_levels),
-      percentile_bin = factor(bin_map[category_map[category]], levels = bin_levels)
+      percentile_bin = factor(bin_map[category_map[category]],
+                              levels = bin_levels)
     ) |>
     filter(!is.na(percentile_cond)) |>
     select(site_no, date, percentile_cond, percentile_bin)
@@ -75,7 +79,10 @@ build_dv_site <- function(dv_new) {
 #' @param date_start first day of focal month
 #' @param date_end last day of focal month
 #' @param breaks Percentile values to bin data at
-add_flow_condition <- function(data_in, date_start, date_end, breaks, break_labels = c("Driest", "Drier", "Dry", "Normal","Wet","Wetter", "Wettest")){
+add_flow_condition <- function(data_in, date_start, date_end, breaks,
+                               break_labels = c("Driest", "Drier",
+                                                "Dry", "Normal","Wet",
+                                                "Wetter", "Wettest")){
   data_in %>% 
     mutate(date = as.Date(dateTime)) %>%
     filter(date >= date_start, date <= date_end, !is.na(per)) %>%
@@ -126,7 +133,8 @@ flow_by_day_by_state <- function(data_in, dv_site, sites_state) {
     summarize(n_gage = length(unique(site_no)))  %>%
     left_join(sites_state) %>% # add total_gage
     mutate(prop = n_gage/total_gage) %>% # proportion of gages
-    pivot_wider(id_cols = !n_gage, names_from = percentile_cond, values_from = prop, values_fill = 0) %>% # complete data for timepoints with 0 gages
+    pivot_wider(id_cols = !n_gage, names_from = percentile_cond, 
+                values_from = prop, values_fill = 0) %>% # complete data for timepoints with 0 gages
     pivot_longer(cols = c("Normal", "Wet", "Wetter", "Wettest", "Driest", "Drier", "Dry"), 
                  names_to = "percentile_cond", values_to = "prop")
 
