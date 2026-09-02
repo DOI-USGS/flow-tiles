@@ -136,6 +136,19 @@ plot_national_area <- function(national_data, date_start, date_end, pal, color_b
   return(plot_nat)
 }
 
+#' @description Pre-render a ggplot to a raster PNG so ggfx layers (e.g.
+#' with_shadow) rasterize at full resolution instead of svglite's fixed 72dpi.
+#' @param plot ggplot object to render
+#' @param width_px target width in pixels
+#' @param height_px target height in pixels
+#' @param dpi target resolution
+render_plot_hires <- function(plot, width_px, height_px, dpi = 300) {
+  tmp <- tempfile(fileext = ".png")
+  ggsave(tmp, plot, width = width_px, height = height_px, units = "px", 
+         dpi = dpi, device = ragg::agg_png)
+  magick::image_read(tmp)
+}
+
 #' @description Compose the final plot and annotate
 #' @param file_out Filepath to save to
 #' @param plot_left The national plot to position on the left
@@ -145,7 +158,7 @@ plot_national_area <- function(national_data, date_start, date_end, pal, color_b
 #' @param height Desired height of output plot
 #' @param color_bknd Plot background color
 #' @param text_color Color of text in plot
-#' @param font_legend font styling 
+#' @param font_legend font styling
 #' @param source_label Source label placed in bottom right of plot
 combine_plots <- function(file_svg, plot_left, plot_right, date_start, width, height, color_bknd, text_color, font_legend, source_label){
   
@@ -209,10 +222,12 @@ combine_plots <- function(file_svg, plot_left, plot_right, date_start, width, he
               height = 0.45 ,
               width = 0.3-plot_margin*2) +
     # state tiles
-   draw_plot(plot_right+theme(text = element_text(family = font_legend, color = text_color)),
+   draw_image(render_plot_hires(plot_right+theme(text = element_text(family = font_legend, color = text_color)),
+                                 width_px = round((1-(0.3+plot_margin*3)) * width * 300),
+                                 height_px = round((1-plot_margin*4) * height * 300)),
              x = 1,
              y = 0+plot_margin*2,
-             height = 1- plot_margin*4, 
+             height = 1- plot_margin*4,
              width = 1-(0.3+plot_margin*3),
              hjust = 1,
              vjust = 0) +
@@ -282,9 +297,12 @@ rm_facet_clip <- function(svg_in, file_out, width){
     xml_find_all("//clipPath") 
   
   # Drop clipPaths around each tile
-  x_drop <- x_clips[4:length(x_clips)] # 4 is based on manual review of svg
+  # 4 is based on manual review of svg
   # TODO: find clipPaths using shared attr
-  xml_remove(x_drop)
+  if (length(x_clips) >= 4) {
+    x_drop <- x_clips[4:length(x_clips)]
+    xml_remove(x_drop)
+  }
   
   # Add xmlns back in and save svg
   xml_set_attr(x, attr = "xmlns", 'http://www.w3.org/2000/svg')
@@ -488,14 +506,16 @@ cartogram_ig <- function(file_svg, plot_nat, plot_cart, date_start, width, heigh
               height = 0.37, width = 0.37,
               hjust = 0, vjust = 1) +
     # state tiles
-    draw_plot(plot_cart+theme(text = element_text(family = font_legend, color = text_color),
-                               strip.text = element_text(size = 6, vjust = -3)),
+    draw_image(render_plot_hires(plot_cart+theme(text = element_text(family = font_legend, color = text_color),
+                                                  strip.text = element_text(size = 6, vjust = -3)),
+                                  width_px = round(1.25 * 1450),
+                                  height_px = round(1.4 * 1450 * height / width)),
               x = 1.12,
               y = -0.19,
               height = 1.4,
               width = 1.25,
               hjust = 1,
-              vjust = 0) + 
+              vjust = 0) +
     # draw title
     draw_label(sprintf('%s %s', plot_month, plot_year),
                x = plot_margin*3, y = 1-plot_margin*2,
