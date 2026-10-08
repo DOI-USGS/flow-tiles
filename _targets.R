@@ -34,7 +34,7 @@ list(
   # Focal month: change this to switch months
   tar_target(
     focal_month,
-    as.Date("2026-08-01")
+    as.Date("2026-09-01")
   ),
   # All dates in the focal month
   tar_target(

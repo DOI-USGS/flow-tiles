@@ -15,6 +15,19 @@ get_state_fips <- function(){
     mutate(state_cd = str_pad(fips, 2, "left", pad = "0"))
 }
 
+#' @description Fix geofacet panel names for ggplot2 >= 4.0
+#' geofacet 0.2.4 drops empty grid cells by gtable panel name, but its names
+#' don't match ggplot2 4.x's `panel-{col}-{row}` convention, so it blanks
+#' real states instead of the empty cells. Rewrite the names so the right
+#' panels are removed.
+#' @param plot A ggplot built with `facet_geo()`
+fix_geofacet_panels <- function(plot){
+  geo_attr <- attr(plot, "geofacet")
+  geo_attr$grid$panel <- paste0("panel-", geo_attr$grid$col, "-", geo_attr$grid$row)
+  attr(plot, "geofacet") <- geo_attr
+  plot
+}
+
 #' @description Basic plotting theme
 #' @param base Font size for relative scaling
 #' @param color_bknd The final plot background color
@@ -49,7 +62,7 @@ theme_flowfacet <- function(base = 12, color_bknd, text_color){
 #' @param xoffset_val Value assigned to x_offset (offset of the shadow) in  `ggfx::with_shawdow()`
 #' @param yoffset_val Value assigned to y_offset (offset of the shadow) in  `ggfx::with_shawdow()`
 plot_state_cartogram <- function(state_data, fips, pal, usa_grid, color_bknd, sigma_val, xoffset_val, yoffset_val){
-  state_data %>%
+  (state_data %>%
     left_join(fips) %>%
     filter(abb %in% usa_grid$code) %>% # drop states/territories not in the grid (e.g. DC)
     ggplot(aes(date, prop)) +
@@ -72,7 +85,8 @@ plot_state_cartogram <- function(state_data, fips, pal, usa_grid, color_bknd, si
           strip.text = element_text(vjust = -1),
           legend.position = 'none'
           )+
-    coord_fixed(ratio = 28)
+    coord_fixed(ratio = 28)) |>
+    fix_geofacet_panels()
 
 }
 
