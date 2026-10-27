@@ -6,7 +6,7 @@ tar_option_set(packages = c('tidyverse', 'lubridate', 'geofacet', 'cowplot','ggf
 
 source("src/prep_data.R")
 source("src/plot_cartogram.R")
-source("src/explainer_prep.R")
+source("src/ig_slides.R")
 
 # wet to dry color scale
 pal_wetdry <- c("#002D5E", "#0C7182", "#6CB7B0", "#C0C0C0", "#F0DB85", "#AF9423", "#A84E0B")
@@ -133,30 +133,28 @@ list(
                          sigma_val = 2.5 , xoffset_val = 0.5, yoffset_val =0.5) 
   ),
   
-  # Plot flow timeseries for national level with adjusted theme settings  - Instagram 
+  # Plot flow timeseries nationally with % and wet/dry labels - Instagram
   tar_target(
     plot_nat_ig,
-    plot_national_area(national_data = flow_national, pal = pal_wetdry, date_start, date_end, color_bknd,
-                       axis_title_size = 40, axis_text_size = 24, axis_title_bottom_size = 38, axis_title_top_size = 46)
+    plot_national_ig(national_data = flow_national, pal = pal_wetdry, text_color, font_legend,
+                     text_size = 9.5, low_lab = "Dry", high_lab = "Wet")
   ),
-  
+
+  # Full-bleed national plot for Instagram title slide background
+  tar_target(
+    plot_nat_bkgd_ig,
+    plot_national_bkgd_ig(national_data = flow_national, pal = pal_wetdry, alpha = 1)
+  ),
+
   # Restyling legend for Instagram dimensions
   tar_target(
-    restyle_legend_ig_national,
+    restyle_legend_ig,
     restyle_legend(plot_nat, text_color, font_legend,
-                   barwidth = 42,
-                   barheight = 2.1,
-                   text_size = 22.75)
+                   barwidth = 14,
+                   barheight = 0.7,
+                   text_size = 7)
   ),
-  
-  tar_target(
-    restyle_legend_ig_cartogram,
-      restyle_legend(plot_nat, text_color, font_legend,
-                     barwidth = 14,
-                     barheight = 0.7,
-                     text_size = 7)
-  ),
-  
+
   # Restyling legend for Instagram story dimensions
   tar_target(
     restyle_legend_ig_story,
@@ -166,40 +164,37 @@ list(
                    text_size = 25)
   ),
 
-  # Flow timeseries nationally - Instagram 
+  # Instagram slide 1: title over national flow
   tar_target(
-    flow_national_instagram_png,
-    national_ig(file_png = "out/flow_national_ig.png",
-                plot_nat_ig,
-                date_start,
-                width = 1080, height = 1350, color_bknd,
-                text_color, source_label, 
-                font_legend, 
-                low_lab = "Dry", 
-                high_lab = "Wet"),
+    ig_1_title_png,
+    ig_title_slide(file_png = "out/ig_1_title.png",
+                   plot_bkgd = plot_nat_bkgd_ig,
+                   date_start,
+                   width = 1080, height = 1350, color_bknd,
+                   text_color, font_legend),
     format = "file"
   ),
-  
-  # Flow timeseries for states - Instagram
+
+  # Instagram slide 2: national flow with legend
   tar_target(
-    flow_cartogram_instagram_svg,
-    cartogram_ig(file_svg = "out/flow_cartogram_ig.svg", 
-                plot_nat,
-                plot_cart_ig, 
-                date_start,
-                width = 1080, height = 1350, color_bknd,
-                text_color, flow_label,
-                restyle_legend = restyle_legend_ig_cartogram,
-                font_legend),
+    ig_2_national_png,
+    ig_national_slide(file_png = "out/ig_2_national.png",
+                      plot_nat_ig,
+                      legend = restyle_legend_ig,
+                      date_start,
+                      width = 1080, height = 1350, color_bknd,
+                      text_color, font_legend, flow_label),
     format = "file"
   ),
-  
-  # Remove facet clipping and save as png 
+
+  # Instagram slide 3: state cartogram tiles
   tar_target(
-    flow_cartogram_instagram_png,
-    rm_facet_clip(svg_in = flow_cartogram_instagram_svg, 
-                  file_out = "out/flow_cartogram_ig.png",
-                  width = 16),
+    ig_3_cartogram_png,
+    ig_cartogram_slide(file_png = "out/ig_3_cartogram.png",
+                       plot_cart = plot_cart_ig,
+                       date_start,
+                       width = 1080, height = 1350, color_bknd,
+                       text_color, font_legend),
     format = "file"
   ),
   
@@ -254,36 +249,5 @@ list(
     pattern = map(plot_cart_state_ig_story_list, state_abbr_filter),
     format = 'file',
     iteration = 'list'
-  ),
-  
-  #### explainer images and updated state ####
-  
-  # cowplot the national plot png for instagram with source label + logo and
-  # optionally check if contents fit in 2025 Instagram safezone for landing image
-  tar_target(
-    explainer_flow_national_ig_png,
-    cowplot_final_national_ig(check_ig_safezone = FALSE,
-                               national_plot_png = flow_national_instagram_png,
-                               file_png_list = list(
-                                 check_ig_safezone = "out/explainer_flow_national_ig_check_safezone.png",
-                                 dont_check_ig_safezone = "out/explainer_flow_national_ig.png"),
-                               ig_grid_lines = "in/4-x-5-layout-guide-for-IGgrid.png",
-                               width = 1080, height = 1350,  font_legend = font_legend,
-                               text_color = text_color),
-    format = "file"
-  ),
-  
-  # create national plot with a lower alpha value to serve as intro question background
-  tar_target(
-    explainer_intro_background,
-    intro_background(national_data = flow_national, percentile_bin, pal = pal_wetdry) 
-  ),
-  
-  # cowplot the intro question instagram png
-  tar_target(
-    intro_question_ig_png,
-    intro_image(plot_nat_clean = explainer_intro_background, date_start, 
-                font_legend, width = 1080, height = 1080, text_size = 20,
-                file_png = "out/intro_question_ig.png")
   )
 )
