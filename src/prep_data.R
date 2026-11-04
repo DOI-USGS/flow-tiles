@@ -1,4 +1,33 @@
 
+#' @description Resolve the focal month (first day of the month to build)
+#' @param focal_env Value of the FOCAL_MONTH env var ("" if unset), e.g. "2026-09-01"
+#' @return A Date: the first of FOCAL_MONTH if set, otherwise the first of last month
+get_focal_month <- function(focal_env = "") {
+  if (nzchar(focal_env)) {
+    floor_date(as.Date(focal_env), "month")
+  } else {
+    floor_date(Sys.Date(), "month") %m-% months(1)
+  }
+}
+
+#' @description Fail if any day of the focal month has no data (avoids silently partial maps)
+#' @param dv_raw Combined parquet data from fetch_month_parquets()
+#' @param dates_to_pull Vector of Dates covering the focal month
+#' @param allow_incomplete If TRUE, warn instead of stopping
+check_month_complete <- function(dv_raw, dates_to_pull, allow_incomplete = FALSE) {
+  if (nrow(dv_raw) == 0) stop("No streamflow data found for any day of the focal month.")
+  dates_found <- unique(as.Date(dv_raw$runtime))
+  missing <- dates_to_pull[!dates_to_pull %in% dates_found]
+  if (length(missing) > 0) {
+    msg <- sprintf("%d of %d days missing data: %s",
+                   length(missing), length(dates_to_pull),
+                   paste(format(missing), collapse = ", "))
+    if (allow_incomplete) warning(msg) else
+      stop(msg, "\nSet ALLOW_INCOMPLETE_MONTH=true to build anyway.")
+  }
+  dv_raw
+}
+
 #' @description Fetch one day's parquet from the current conditions data source
 #' @param date A single Date value
 #' @param base_url Base URL prefix; date (YYYY-MM-DD) and .parquet are appended

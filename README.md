@@ -30,4 +30,11 @@ Streamflow data come from the [current conditions pipeline](https://code.usgs.go
 https://dfi09q69oy2jm.cloudfront.net/visualizations/current_conditions/streamflow/data/sf_categorizations_{YYYY-MM-DD}.parquet
 ```
 
-To build a new month, set `focal_month` in `_targets.R` to the first day of that month (e.g. `as.Date("2026-09-01")`) and run `tar_make()`. Any day without a file is skipped with a warning.
+By default `tar_make()` builds the **previous calendar month**. To build a specific month, set `FOCAL_MONTH` first:
+
+```r
+Sys.setenv(FOCAL_MONTH = "2026-09-01")
+targets::tar_make()
+```
+
+The build stops if any day of the month has no file, so the map is never silently partial. To build anyway (e.g. mid-month testing), set `Sys.setenv(ALLOW_INCOMPLETE_MONTH = "true")`.
