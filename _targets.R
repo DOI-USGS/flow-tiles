@@ -31,10 +31,14 @@ source_label <- "Data: USGS Water Data for the Nation"
 
 # to produce the flow cartogram, run tar_make() in the console
 list(
-  # Focal month: change this to switch months
+  # Focal month: defaults to the previous calendar month.
+  # To build a specific month, set FOCAL_MONTH before tar_make(), e.g.
+  # Sys.setenv(FOCAL_MONTH = "2026-09-01")
+  # cue "always" re-checks the date each run so a new month isn't skipped by the cache
   tar_target(
     focal_month,
-    as.Date("2026-10-01")
+    get_focal_month(Sys.getenv("FOCAL_MONTH")),
+    cue = tar_cue(mode = "always")
   ),
   # All dates in the focal month
   tar_target(
@@ -43,8 +47,15 @@ list(
   ),
   # Download and combine all daily parquets for the month
   tar_target(
-    dv,
+    dv_raw,
     fetch_month_parquets(dates_to_pull, base_url)
+  ),
+  # Stop if any day of the month is missing, unless ALLOW_INCOMPLETE_MONTH=true
+  tar_target(
+    dv,
+    check_month_complete(dv_raw, dates_to_pull,
+                         allow_incomplete = tolower(Sys.getenv("ALLOW_INCOMPLETE_MONTH")) == "true"),
+    cue = tar_cue(mode = "always")
   ),
   tar_target(
     date_start,
